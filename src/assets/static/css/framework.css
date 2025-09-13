@@ -1,0 +1,20 @@
+
+.pointer{
+  cursor: pointer;
+}
+
+.cursor-default{
+  cursor: default;
+}
+
+.focus-border-secondary:focus{
+  border-color: #969696;
+}
+
+.flex-1{
+  flex: 1;
+}
+
+.rounded-full{
+  border-radius: 50%;
+}

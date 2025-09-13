@@ -1,0 +1,15 @@
+.login form {
+  margin-top: 50px;
+  padding: 20px;
+  border: 1px solid rgb(209, 209, 209);
+  border-radius: 20px;
+
+}
+
+@media (min-width: 850px) {
+  .login form {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
