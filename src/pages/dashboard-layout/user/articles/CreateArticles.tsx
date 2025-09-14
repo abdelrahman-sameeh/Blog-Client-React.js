@@ -46,7 +46,7 @@ const validation = (
   return true
 };
 
-export const CreateArticle = () => {
+export const CreateArticlePage = () => {
   const [categories, setCategories] = useRecoilState(categoriesAtom);
   const [tags, setTags] = useRecoilState(tagsAtom);
   const [title, setTitle] = useState("");

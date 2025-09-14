@@ -8,7 +8,7 @@ import { Helmet } from "../../../components/utils/Helmet";
 import notify from "../../../components/utils/Notify";
 import { LoadingButton } from "../../../components/utils/LoadingButton";
 
-export const Login = () => {
+export const LoginPage = () => {
   const [useEmail, setUseEmail] = useState(true); // toggle بين الإيميل واليوزرنيم
   const [data, setData] = useState({
     email: "",

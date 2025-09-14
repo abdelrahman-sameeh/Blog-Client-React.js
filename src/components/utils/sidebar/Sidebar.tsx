@@ -32,7 +32,7 @@ export const Sidebar = () => {
       <div className="container d-flex flex-column justify-content-center align-items-center">
         <Search />
         <Link
-          to={"/write"}
+          to={"/dashboard/user/create-article"}
           className="text-dark text-decoration-none text-capitalize d-flex gap-1 my-4"
         >
           <MdOutlineNoteAlt className="fs-3" />

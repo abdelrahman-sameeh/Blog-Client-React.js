@@ -10,8 +10,9 @@ export interface IArticle {
   createdAt?: Date;
   updatedAt?: Date;
   blocks?: IArticleBlock[];
-  tags?: { _id: string; title?: string }[]
-  likes?: IUser[],
-  comments?: any[]
+  tags?: { _id: string; title?: string }[];
+  likes?: IUser[];
+  comments?: any[];
+  isSavedArticle?: boolean;
 }
 

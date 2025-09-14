@@ -9,7 +9,7 @@ import { Helmet } from "../../../components/utils/Helmet";
 import notify from "../../../components/utils/Notify";
 import { LoadingButton } from "../../../components/utils/LoadingButton";
 
-export const Register = () => {
+export const RegisterPage = () => {
   const [data, setData] = useState({
     firstName: "",
     lastName: "",

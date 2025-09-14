@@ -1,22 +1,24 @@
 import { Route, Routes } from "react-router-dom";
-import { Register } from "./pages/auth/register/Register";
-import { Login } from "./pages/auth/login/Login";
+import { RegisterPage } from "./pages/auth/register/Register";
+import { LoginPage } from "./pages/auth/login/Login";
 import { MainLayout } from "./layout/MainLayout";
 import { DashboardLayout } from "./layout/DashboardLayout";
 import {IsAuth} from "./hooks/IsAuth";
-import { UserArticles } from "./pages/dashboard-layout/user/articles/UserArticles";
-import { CreateArticle } from "./pages/dashboard-layout/user/articles/CreateArticles";
-import { Home } from "./pages/main-layout/home/Home";
+import { UserArticlesPage } from "./pages/dashboard-layout/user/articles/UserArticles";
+import { CreateArticlePage } from "./pages/dashboard-layout/user/articles/CreateArticles";
+import { HomePage } from "./pages/main-layout/home/Home";
+import { ArticlePage } from "./pages/main-layout/article/ArticlePage";
 
 function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
       {/* Main layout */}
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/article/:id" element={<ArticlePage />} />
       </Route>
 
       {/* Dashboard layout */}
@@ -29,8 +31,8 @@ function App() {
           
           {/* User role */}
           <Route path="user">
-            <Route path={'articles'} element={<UserArticles />} />
-            <Route path={'create-article'} element={<CreateArticle />} />
+            <Route path={'articles'} element={<UserArticlesPage />} />
+            <Route path={'create-article'} element={<CreateArticlePage />} />
 
           </Route>
 

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export const UserArticles = () => {
+export const UserArticlesPage = () => {
   return (
     <>
       <div className="d-flex justify-content-between align-items-start">

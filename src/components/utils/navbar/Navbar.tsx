@@ -25,7 +25,7 @@ export const Navbar = () => {
             >
               <Search />
               <Link
-                to={"/write"}
+                to={"/dashboard/user/create-article"}
                 className="text-dark text-decoration-none text-capitalize d-flex gap-1"
               >
                 <MdOutlineNoteAlt className="fs-4" />
