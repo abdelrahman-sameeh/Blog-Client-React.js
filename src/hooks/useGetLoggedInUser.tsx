@@ -11,6 +11,8 @@ export const useLoggedInUser = (ignoreCache: boolean = false) => {
   const handleResponse = (response: any) => {
     if (response?.status === 200) {
       const fetchedUser = response?.data;
+      console.log(fetchedUser);
+      
       setUser(fetchedUser);
       sessionStorage.setItem("user", JSON.stringify(fetchedUser));
     }

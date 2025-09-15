@@ -13,5 +13,9 @@ export const ApiEndpoints = {
   dislikeArticle: (articleId: string) => `${mainPath}/article/${articleId}/dislike`,
   saveArticle: `${mainPath}/articles/save`,
   unsaveArticle: `${mainPath}/articles/unsave`,
+  getReviewReplies: (commentId: string) => `${mainPath}/review/${commentId}/reply`,
+  likeReply: (reviewId: string) => `${mainPath}/review/${reviewId}/like`,
+  dislikeReply: (reviewId: string) => `${mainPath}/review/${reviewId}/dislike`,
+  createComment: `${mainPath}/review`,
   
 }

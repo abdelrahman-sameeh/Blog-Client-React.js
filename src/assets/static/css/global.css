@@ -117,3 +117,20 @@ body * {
     transform: rotateY(0deg) translateX(0px);
   }
 }
+
+
+/* Comment */
+.comment-form{
+  transition: height .3s ease;
+}
+
+.comment-form.hide{
+  height: 40px;
+  overflow: hidden;
+}
+
+.comment-form.show{
+  height: 220px;
+  overflow: auto;
+}
+

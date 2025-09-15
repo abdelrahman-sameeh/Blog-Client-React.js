@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
@@ -13,6 +13,8 @@ import { LoadingButton } from "../../../components/utils/LoadingButton";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { MdOutlineCategory } from "react-icons/md";
+import { Button, Form } from "react-bootstrap";
+import { ArticleCommentsComponent } from "../../../components/main-layout/ArticleCommentsComponent";
 
 export const ArticlePage = () => {
   const { id } = useParams();
@@ -22,7 +24,10 @@ export const ArticlePage = () => {
   const [loading, setLoading] = useState({
     reactionLoading: false,
     bookmarkLoading: false,
+    commentLoading: false,
   });
+  const [comment, setComment] = useState("");
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const getArticleDetails = async () => {
@@ -92,6 +97,38 @@ export const ArticlePage = () => {
     setLoading((prev) => ({ ...prev, bookmarkLoading: false }));
   };
 
+  const handleCreateComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!comment) {
+      notify("Comment is required", "warning");
+      return;
+    }
+    const data = {
+      article: id,
+      content: comment,
+    };
+    setLoading((prev) => ({ ...prev, commentLoading: true }));
+    const response = await authAxios(
+      true,
+      ApiEndpoints.createComment,
+      "POST",
+      data
+    );
+    setLoading((prev) => ({ ...prev, commentLoading: false }));
+
+    if (response.status === 201) {
+      const data = {
+        ...response.data.data,
+        author: user,
+      };
+      setArticle((prev) => ({
+        ...prev,
+        comments: [...(prev?.comments as any), data],
+      }));
+      setComment("");
+    }
+  };
+
   return (
     <div style={{ paddingTop: "100px" }}>
       <div className="container">
@@ -111,9 +148,20 @@ export const ArticlePage = () => {
             className="text-dark text-decoration-none d-flex align-items-center gap-2 flex-wrap"
           >
             {article?.user?.picture ? (
-              <img src={article?.user.picture} />
+              <img
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+                src={article?.user.picture}
+              />
             ) : (
-              <p className="border m-0 rounded-full px-2 py-2 border-dark text-uppercase">
+              <p
+                style={{ width: "50px", height: "50px" }}
+                className="d-flex justify-content-center align-items-center border m-0 rounded-full border-dark text-uppercase"
+              >
                 {article?.user?.firstName?.[0]}
                 {article?.user?.lastName?.[0]}{" "}
               </p>
@@ -138,7 +186,7 @@ export const ArticlePage = () => {
 
         <hr />
 
-        {/* Likes and bookmark */}
+        {/* Likes and  bookmark */}
         <div className="d-flex justify-content-between align-items-center">
           <div className="d-flex gap-4">
             <div className="likes">
@@ -265,9 +313,98 @@ export const ArticlePage = () => {
           })}
         </div>
 
-        <hr className="pb-3" />
+        <hr />
 
         {/* Comments */}
+
+        <div className="mb-3">
+          <h4>Comments ({article.comments?.length}) </h4>
+          <div className="text-dark text-decoration-none d-flex align-items-center gap-2 flex-wrap">
+            {article?.user?.picture ? (
+              <img
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+                src={article?.user.picture}
+              />
+            ) : (
+              <p className="border m-0 rounded-full px-2 py-2 border-dark text-uppercase">
+                {article?.user?.firstName?.[0]}
+                {article?.user?.lastName?.[0]}{" "}
+              </p>
+            )}
+            <span className="text-capitalize">{article?.user?.username}</span>
+          </div>
+          <Form
+            onClick={() => setShowForm(true)}
+            className={`mt-2 mb-4 comment-form ${
+              showForm ? "show" : "hide"
+            } rounded`}
+          >
+            <Form.Group controlId="exampleForm.ControlTextarea1">
+              <Form.Control
+                style={{
+                  resize: "none",
+                  backgroundColor: "#f2f2f2",
+                  borderBottomRightRadius: "0",
+                  borderBottomLeftRadius: "0",
+                }}
+                className="shadow-none border-0"
+                as="textarea"
+                rows={5}
+                value={comment}
+                onChange={(e) => {
+                  setComment(e.target.value);
+                }}
+                placeholder="What are you thoughts?"
+              />
+            </Form.Group>
+            <div
+              className="d-flex gap-2 p-3"
+              style={{
+                flexDirection: "row-reverse",
+                marginTop: "-3px",
+                backgroundColor: "#f2f2f2",
+                borderBottomRightRadius: "6px",
+                borderBottomLeftRadius: "6px",
+              }}
+            >
+              <LoadingButton
+                onClick={handleCreateComment}
+                type="submit"
+                className={`text-capitalize`}
+                disabled={
+                  (!comment.length ? true : false) || loading.commentLoading
+                }
+                loading={loading.commentLoading}
+                variant="dark"
+                tabIndex={0}
+              >
+                comment
+              </LoadingButton>
+              <Button
+                type="button"
+                onClick={() => {
+                  setComment("");
+                }}
+                disabled={
+                  (!comment.length ? true : false) || loading.commentLoading
+                }
+                className={`text-capitalize`}
+                variant="danger"
+              >
+                reset
+              </Button>
+            </div>
+          </Form>
+
+          <hr />
+
+          <ArticleCommentsComponent />
+        </div>
       </div>
     </div>
   );

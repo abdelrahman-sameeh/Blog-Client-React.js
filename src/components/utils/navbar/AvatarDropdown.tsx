@@ -16,7 +16,8 @@ export const AvatarDropdown = () => {
       {user?.picture ? (
         <img
           src={user.picture}
-          className={`avatar dropdown-toggle ${style.avatarMenu}`}
+          style={{width: "40px", height: "40px", objectFit: "cover"}}
+          className={`avatar dropdown-toggle rounded-full ${style.avatarMenu}`}
           data-bs-toggle="dropdown"
         />
       ) : (
