@@ -9,4 +9,5 @@ export interface IComment{
   content?: string;
   likes?: IUser[];
   numberOfReplies?: number;
+  parentReview: string;
 }

@@ -17,6 +17,7 @@ import { AddTagModal } from "../../../../components/dashboard/owner/articles/Add
 import { PreviewModal } from "../../../../components/dashboard/owner/articles/PreviewModal";
 import { articleAtom } from "../../../../recoil/articles/article-atom";
 import { useLoggedInUser } from "../../../../hooks/useGetLoggedInUser";
+import { useModal } from "../../../../hooks/useModal";
 
 const validation = (
   title: string,
@@ -101,15 +102,6 @@ export const CreateArticlePage = () => {
 
     fetchData();
   }, []);
-
-  function useModal() {
-    const [isOpen, setIsOpen] = useState(false);
-
-    const open = () => setIsOpen(true);
-    const close = () => setIsOpen(false);
-
-    return { isOpen, open, close };
-  }
 
   const blockModal = useModal();
   const tagModal = useModal();

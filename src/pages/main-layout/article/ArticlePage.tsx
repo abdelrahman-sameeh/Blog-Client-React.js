@@ -319,88 +319,93 @@ export const ArticlePage = () => {
 
         <div className="mb-3">
           <h4>Comments ({article.comments?.length}) </h4>
-          <div className="text-dark text-decoration-none d-flex align-items-center gap-2 flex-wrap">
-            {article?.user?.picture ? (
-              <img
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                }}
-                src={article?.user.picture}
-              />
-            ) : (
-              <p className="border m-0 rounded-full px-2 py-2 border-dark text-uppercase">
-                {article?.user?.firstName?.[0]}
-                {article?.user?.lastName?.[0]}{" "}
-              </p>
-            )}
-            <span className="text-capitalize">{article?.user?.username}</span>
-          </div>
-          <Form
-            onClick={() => setShowForm(true)}
-            className={`mt-2 mb-4 comment-form ${
-              showForm ? "show" : "hide"
-            } rounded`}
-          >
-            <Form.Group controlId="exampleForm.ControlTextarea1">
-              <Form.Control
-                style={{
-                  resize: "none",
-                  backgroundColor: "#f2f2f2",
-                  borderBottomRightRadius: "0",
-                  borderBottomLeftRadius: "0",
-                }}
-                className="shadow-none border-0"
-                as="textarea"
-                rows={5}
-                value={comment}
-                onChange={(e) => {
-                  setComment(e.target.value);
-                }}
-                placeholder="What are you thoughts?"
-              />
-            </Form.Group>
-            <div
-              className="d-flex gap-2 p-3"
-              style={{
-                flexDirection: "row-reverse",
-                marginTop: "-3px",
-                backgroundColor: "#f2f2f2",
-                borderBottomRightRadius: "6px",
-                borderBottomLeftRadius: "6px",
-              }}
-            >
-              <LoadingButton
-                onClick={handleCreateComment}
-                type="submit"
-                className={`text-capitalize`}
-                disabled={
-                  (!comment.length ? true : false) || loading.commentLoading
-                }
-                loading={loading.commentLoading}
-                variant="dark"
-                tabIndex={0}
+          {user?._id ? (
+            <>
+              <div className="text-dark text-decoration-none d-flex align-items-center gap-2 flex-wrap">
+                {user?.picture ? (
+                  <img
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                    src={user.picture}
+                  />
+                ) : (
+                  <p className="border m-0 rounded-full px-2 py-2 border-dark text-uppercase">
+                    {user?.firstName?.[0]}
+                    {user?.lastName?.[0]}{" "}
+                  </p>
+                )}
+                <span className="text-capitalize">{user?.username}</span>
+              </div>
+              <Form
+                onClick={() => setShowForm(true)}
+                className={`mt-2 mb-4 comment-form ${
+                  showForm ? "show" : "hide"
+                } rounded`}
               >
-                comment
-              </LoadingButton>
-              <Button
-                type="button"
-                onClick={() => {
-                  setComment("");
-                }}
-                disabled={
-                  (!comment.length ? true : false) || loading.commentLoading
-                }
-                className={`text-capitalize`}
-                variant="danger"
-              >
-                reset
-              </Button>
-            </div>
-          </Form>
-
+                <Form.Group controlId="exampleForm.ControlTextarea1">
+                  <Form.Control
+                    style={{
+                      resize: "none",
+                      backgroundColor: "#f2f2f2",
+                      borderBottomRightRadius: "0",
+                      borderBottomLeftRadius: "0",
+                    }}
+                    className="shadow-none border-0"
+                    as="textarea"
+                    rows={5}
+                    value={comment}
+                    onChange={(e) => {
+                      setComment(e.target.value);
+                    }}
+                    placeholder="What are you thoughts?"
+                  />
+                </Form.Group>
+                <div
+                  className="d-flex gap-2 p-3"
+                  style={{
+                    flexDirection: "row-reverse",
+                    marginTop: "-3px",
+                    backgroundColor: "#f2f2f2",
+                    borderBottomRightRadius: "6px",
+                    borderBottomLeftRadius: "6px",
+                  }}
+                >
+                  <LoadingButton
+                    onClick={handleCreateComment}
+                    type="submit"
+                    className={`text-capitalize`}
+                    disabled={
+                      !comment.length || loading.commentLoading
+                    }
+                    loading={loading.commentLoading}
+                    variant="dark"
+                    tabIndex={0}
+                  >
+                    comment
+                  </LoadingButton>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setComment("");
+                    }}
+                    disabled={
+                      (!comment.length ? true : false) || loading.commentLoading
+                    }
+                    className={`text-capitalize`}
+                    variant="danger"
+                  >
+                    reset
+                  </Button>
+                </div>
+              </Form>
+            </>
+          ) : (
+            ""
+          )}
           <hr />
 
           <ArticleCommentsComponent />

@@ -120,7 +120,7 @@ body * {
 
 
 /* Comment */
-.comment-form{
+.comment-form, .reply-form{
   transition: height .3s ease;
 }
 
@@ -131,6 +131,16 @@ body * {
 
 .comment-form.show{
   height: 220px;
+  overflow: auto;
+}
+
+.reply-form.hide{
+  height: 0px;
+  overflow: hidden;
+}
+
+.reply-form.show{
+  height: 151px;
   overflow: auto;
 }
 
