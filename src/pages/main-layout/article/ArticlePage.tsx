@@ -130,7 +130,7 @@ export const ArticlePage = () => {
   };
 
   return (
-    <div style={{ paddingTop: "100px" }}>
+    <main className="main-content" >
       <div className="container">
         <div className="d-flex justify-content-between align-items-center flex-wrap">
           <h2 className="fw-bold text-capitalize">{article?.title}</h2>
@@ -411,6 +411,6 @@ export const ArticlePage = () => {
           <ArticleCommentsComponent />
         </div>
       </div>
-    </div>
+    </main>
   );
 };

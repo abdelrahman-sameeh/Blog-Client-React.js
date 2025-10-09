@@ -128,8 +128,6 @@ export const CreateArticlePage = () => {
     selectedTags.forEach((tag) => {
       formData.append(`tags[]`, tag.label);
     });
-    console.log("response");
-
     const response = await authAxios(
       true,
       ApiEndpoints.listCreateArticle(),

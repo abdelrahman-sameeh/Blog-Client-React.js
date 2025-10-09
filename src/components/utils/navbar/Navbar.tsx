@@ -10,14 +10,16 @@ export const Navbar = () => {
   const { user } = useLoggedInUser();
 
   const handleToggleSidebar = () => {
-    const sidebar = document.querySelector(".sidebar")
-    sidebar?.classList?.toggle("show")
-  }
+    const sidebar = document.querySelector(".sidebar");
+    sidebar?.classList?.toggle("show");
+  };
 
   return (
     <div className="navbar border-bottom py-3 border-secondary">
-      <div className="container d-flex justify-content-between align-items-center">
-        <span className="logo d-inline-block fs-2 fw-bold user-select-none text-capitalize">medium mirror</span>
+      <div className="w-100 px-4 container-fluid d-flex justify-content-between align-items-center flex-nowrap">
+        <span className="logo d-inline-block fs-2 fw-bold user-select-none text-capitalize">
+          medium mirror
+        </span>
         <div>
           {user?._id ? (
             <div
@@ -45,8 +47,11 @@ export const Navbar = () => {
         {/* Bars displayed for only logged in accounts */}
         {user?._id && (
           <>
-            <div onClick={handleToggleSidebar} className="bars d-none p-2 pointer">
-              <HiMiniBars3BottomRight className="fs-3"/>
+            <div
+              onClick={handleToggleSidebar}
+              className="bars d-none p-2 pointer"
+            >
+              <HiMiniBars3BottomRight className="fs-3" />
             </div>
             <Sidebar />
           </>

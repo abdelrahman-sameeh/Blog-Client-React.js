@@ -6,9 +6,9 @@ export const ApiEndpoints = {
   login: `${mainPath}/login`,
   getLoggedInUser: `${mainPath}/auth`,
   getCategories: `${mainPath}/category`,
-  listCreateArticle: (query: string="") => `${mainPath}/article?${query}`,
-  listCreateTag:  `${mainPath}/tag`,
-  getDeleteArticle:  (id: string)=>`${mainPath}/article/${id}`,
+  listCreateArticle: (query: string = "") => `${mainPath}/article?${query}`,
+  listCreateTag: `${mainPath}/tag`,
+  getDeleteArticle: (id: string) => `${mainPath}/article/${id}`,
   likeArticle: (articleId: string) => `${mainPath}/article/${articleId}/like`,
   dislikeArticle: (articleId: string) => `${mainPath}/article/${articleId}/dislike`,
   saveArticle: `${mainPath}/articles/save`,
@@ -18,6 +18,6 @@ export const ApiEndpoints = {
   dislikeReply: (reviewId: string) => `${mainPath}/review/${reviewId}/dislike`,
   createComment: `${mainPath}/review`,
   createReply: `${mainPath}/reply`,
-  deleteReview: (reviewId: string) => `${mainPath}/review/${reviewId}`
-  
+  deleteReview: (reviewId: string) => `${mainPath}/review/${reviewId}`,
+  getFilters: `${mainPath}/filters`
 }

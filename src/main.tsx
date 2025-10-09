@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import "./assets/static/css/framework.css";
 import "./assets/static/css/global.css";
+import "./assets/static/js/main.js";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>

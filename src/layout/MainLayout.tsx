@@ -6,11 +6,11 @@ import { Footer } from "../components/utils/Footer"
 
 export const MainLayout = () => {
   return (
-    <>
+    <div className="page">
       <Navbar />
       <Outlet />
       <Footer />
-    </>
+    </div>
   )
 }
 

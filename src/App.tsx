@@ -8,6 +8,7 @@ import { UserArticlesPage } from "./pages/dashboard-layout/user/articles/UserArt
 import { CreateArticlePage } from "./pages/dashboard-layout/user/articles/CreateArticles";
 import { HomePage } from "./pages/main-layout/home/Home";
 import { ArticlePage } from "./pages/main-layout/article/ArticlePage";
+import { SearchArticlesPage } from "./pages/main-layout/article/SearchArticlesPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/article/:id" element={<ArticlePage />} />
+        <Route path="/search" element={<SearchArticlesPage />} />
       </Route>
 
       {/* Dashboard layout */}
