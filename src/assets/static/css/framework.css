@@ -1,20 +1,28 @@
-
-.pointer{
+.pointer {
   cursor: pointer;
 }
 
-.cursor-default{
+.cursor-default {
   cursor: default;
 }
 
-.focus-border-secondary:focus{
+.focus-border-secondary:focus {
   border-color: #969696;
 }
 
-.flex-1{
+.flex-1 {
   flex: 1;
 }
 
-.rounded-full{
+.rounded-full {
   border-radius: 50%;
+}
+
+.text-truncate-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }

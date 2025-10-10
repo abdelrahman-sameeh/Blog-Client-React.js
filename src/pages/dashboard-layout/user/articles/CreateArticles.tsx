@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { CiPlay1 } from "react-icons/ci";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { categoriesAtom } from "../../../../recoil/category-atoms";
+import { categoriesAtom } from "../../../../recoil/categories-atoms";
 import authAxios from "../../../../api/auth-axios";
 import { ApiEndpoints } from "../../../../api/api-endpoints";
 import { FaPlus } from "react-icons/fa";
@@ -18,6 +18,7 @@ import { PreviewModal } from "../../../../components/dashboard/owner/articles/Pr
 import { articleAtom } from "../../../../recoil/articles/article-atom";
 import { useLoggedInUser } from "../../../../hooks/useGetLoggedInUser";
 import { useModal } from "../../../../hooks/useModal";
+import type { ITag } from "../../../../utils/interfaces/tag-interface";
 
 const validation = (
   title: string,
@@ -92,7 +93,7 @@ export const CreateArticlePage = () => {
 
       setCategories(categoriesRes.data.data);
 
-      const newTags = tagsRes.data.map((tag: any) => ({
+      const newTags = tagsRes.data.map((tag: ITag) => ({
         label: tag.title,
         value: tag._id,
       }));

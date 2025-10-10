@@ -1,24 +1,41 @@
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { searchAtom } from "../../../recoil/search-atom";
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
+import {
+  Badge,
+  Button,
+  Card,
+  Col,
+  Form,
+  InputGroup,
+  Row,
+} from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
 import { IoFilterOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import type { IArticle } from "../../../utils/interfaces/article.interface";
-import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
 import { useDebounce } from "../../../hooks/useDebounce";
 import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
 import type { IPagination } from "../../../utils/interfaces/pagination-interface";
 import type { ICategory } from "../../../utils/interfaces/category-interface";
+import { Link } from "react-router-dom";
+import { FaHandsClapping } from "react-icons/fa6";
+import { TagsFilterComponent } from "../../../components/main-layout/search-article-page-component/TagsFilterComponent";
+import { CategoryFilterComponent } from "../../../components/main-layout/search-article-page-component/CategoryFiltercomponent";
+import type { ITag } from "../../../utils/interfaces/tag-interface";
+import { categoriesAtom } from "../../../recoil/categories-atoms";
+import { tagsAtom } from "../../../recoil/tags-atom";
 
 export const SearchArticlesPage = () => {
   const [search, setSearch] = useRecoilState(searchAtom);
   const [hide, setHide] = useState(true);
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [tags, setTags] = useState<ICategory[]>([]);
+  const setCategories = useSetRecoilState(categoriesAtom);
+  const setTags = useSetRecoilState(tagsAtom);
   const [articles, setArticles] = useState<IArticle[]>([]);
   const [pagination, setPagination] = useState<IPagination>({});
+  const [selectedCategories, setSelectedCategories] = useState<ICategory[]>([]);
+  const [selectedTags, setSelectedTags] = useState<ITag[]>([]);
+  const [numberOfResults, setNumberOfResults] = useState(1);
   // const { user } = useLoggedInUser();
   const debouncedSearch = useDebounce(search);
   const [loadings, setLoadings] = useState<Record<string, boolean>>({});
@@ -33,15 +50,26 @@ export const SearchArticlesPage = () => {
     });
   }, []);
 
-  
-
-
   const createQuery = () => {
-    let query = "";
+    let query = `limit=${numberOfResults}&`;
     if (debouncedSearch) {
       query += `search=${debouncedSearch}&`;
     }
+    if (selectedCategories.length > 0) {
+      for (const cat of selectedCategories) {
+        query += `categories[]=${cat._id}&`;
+      }
+    }
+    if (selectedTags.length > 0) {
+      for (const tag of selectedTags) {
+        query += `tags[]=${tag._id}&`;
+      }
+    }
+    if (pagination.page) {
+      query += `page=${pagination.page}&`;
+    }
 
+    query = query.slice(0, -1);
     return query;
   };
 
@@ -56,25 +84,37 @@ export const SearchArticlesPage = () => {
       setArticles(response?.data?.data?.articles || []);
       setPagination(response?.data?.pagination || {});
     }
-    delete loadings[search];
+    setLoadings((prev) => {
+      delete prev["search"];
+      return { ...prev };
+    });
   };
 
   useEffect(() => {
     fetchData();
-  }, [debouncedSearch]);
+  }, [
+    debouncedSearch,
+    selectedCategories,
+    selectedTags,
+    pagination.page,
+    numberOfResults,
+  ]);
 
   return (
     <main className="main-content search-page">
-      <div className="container">
+      <div className="ms-5 me-2">
         <Row className="mx-0">
-          <Col md={9} sm={12} className="pt-4">
+          <Col lg={9} md={8} sm={12} className="pt-4">
             <InputGroup className="mb-3">
               <InputGroup.Text id="basic-addon1">
                 <CiSearch />
               </InputGroup.Text>
               <Form.Control
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPagination((prev) => ({ ...prev, page: 1 }));
+                }}
                 className="shadow-none search-input"
                 placeholder="Search article"
                 type="search"
@@ -95,12 +135,210 @@ export const SearchArticlesPage = () => {
                 <IoFilterOutline />
               </Button>
             </InputGroup>
+
+            <div className="articles-list">
+              {loadings["search"] ? (
+                <div className="text-center my-5">
+                  <div className="spinner-border text-secondary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              ) : articles.length == 0 ? (
+                <div className="text-center my-5">
+                  <h5 className="text-secondary">No articles found</h5>
+                </div>
+              ) : (
+                articles.map((article) => {
+                  return (
+                    <Card
+                      key={article._id}
+                      className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden"
+                    >
+                      <Card.Body>
+                        <div className="d-flex align-items-center mb-3 gap-2">
+                          {article?.user?.picture ? (
+                            <img
+                              src={article?.user?.picture}
+                              alt={article?.user?.username}
+                              className="rounded-circle object-fit-cover"
+                              width={45}
+                              height={45}
+                            />
+                          ) : (
+                            <div className="user-picture-placeholder border p-2 rounded-circle">
+                              {article?.user?.firstName
+                                ?.charAt(0)
+                                .toUpperCase()}
+                              {article?.user?.lastName?.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <h6 className="mb-0">
+                              {article?.user?.firstName}{" "}
+                              {article?.user?.lastName}
+                            </h6>
+                            <small className="text-muted">
+                              @{article?.user?.username}
+                            </small>
+                          </div>
+                        </div>
+
+                        <h4 className="fw-bold mb-2 text-truncate-2">
+                          {article.title}
+                        </h4>
+
+                        <Badge bg="secondary" className="mb-2">
+                          {article?.category?.title}
+                        </Badge>
+
+                        <div className="mb-3">
+                          {article?.tags?.map((tag) => (
+                            <Badge
+                              key={tag._id}
+                              bg="light"
+                              text="dark"
+                              className="me-2 border"
+                            >
+                              #{tag.title}
+                            </Badge>
+                          ))}
+                        </div>
+
+                        <div className="d-flex justify-content-between align-items-center">
+                          <div className="d-flex align-items-center">
+                            <FaHandsClapping className="me-1 fs-5" />
+                            <span>{article?.likes?.length}</span>
+                          </div>
+                          <Link
+                            to={`/article/${article._id}`}
+                            className="btn btn-outline-primary btn-sm rounded-pill"
+                          >
+                            Read more →
+                          </Link>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  );
+                })
+              )}
+
+              {/* create pagination here  */}
+              {pagination?.pages && pagination.pages > 1 && (
+                <div className="d-flex justify-content-center mt-4">
+                  <nav>
+                    <ul className="pagination pagination-sm mb-0">
+                      {/* زر Previous */}
+                      <li
+                        className={`page-item ${
+                          pagination.page === 1 ? "disabled" : ""
+                        }`}
+                      >
+                        <button
+                          className="page-link"
+                          onClick={() => {
+                            if (pagination.page && pagination.page > 1) {
+                              const newPage = pagination.page - 1;
+                              setPagination((prev) => ({
+                                ...prev,
+                                page: newPage,
+                              }));
+                            }
+                          }}
+                        >
+                          Previous
+                        </button>
+                      </li>
+
+                      {/* أرقام الصفحات */}
+                      {Array.from(
+                        { length: pagination.pages },
+                        (_, i) => i + 1
+                      ).map((num) => (
+                        <li
+                          key={num}
+                          className={`page-item ${
+                            pagination.page === num ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => {
+                              if (num !== pagination.page) {
+                                setPagination((prev) => ({
+                                  ...prev,
+                                  page: num,
+                                }));
+                              }
+                            }}
+                          >
+                            {num}
+                          </button>
+                        </li>
+                      ))}
+
+                      {/* زر Next */}
+                      <li
+                        className={`page-item ${
+                          pagination.page === pagination.pages ? "disabled" : ""
+                        }`}
+                      >
+                        <button
+                          className="page-link"
+                          onClick={() => {
+                            if (
+                              pagination.page &&
+                              pagination.page < (pagination.pages || 1)
+                            ) {
+                              const newPage = pagination.page + 1;
+                              setPagination((prev) => ({
+                                ...prev,
+                                page: newPage,
+                              }));
+                            }
+                          }}
+                        >
+                          Next
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              )}
+            </div>
           </Col>
+
+          {/* Filters */}
           <Col
-            md={3}
+            lg={3}
+            md={4}
             className={`filters ${hide ? "hide" : ""} border-start pt-4`}
           >
-            filters
+            <h5 className="mb-3">Filters</h5>
+
+            <CategoryFilterComponent
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
+            />
+
+            <TagsFilterComponent
+              selectedTags={selectedTags}
+              setSelectedTags={setSelectedTags}
+            />
+
+            <Form>
+              <h5 className="mt-3">Number of results per page</h5>
+              {[1, 5, 10, 15, 20].map((num) => (
+                <Form.Check
+                  key={num}
+                  type="switch"
+                  name="numberOfResults"
+                  id={`results-${num}`}
+                  label={`${num} per page`}
+                  checked={numberOfResults === num}
+                  onChange={() => setNumberOfResults(num)}
+                />
+              ))}
+            </Form>
           </Col>
         </Row>
       </div>

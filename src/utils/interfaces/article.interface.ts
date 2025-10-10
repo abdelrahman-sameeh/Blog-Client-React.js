@@ -1,6 +1,7 @@
 import type { IArticleBlock } from "./article-block-interface";
 import type { ICategory } from "./category-interface";
 import type { IComment } from "./comment-interface";
+import type { ITag } from "./tag-interface";
 import type { IUser } from "./user-interface";
 
 export interface IArticle {
@@ -11,7 +12,7 @@ export interface IArticle {
   createdAt?: Date;
   updatedAt?: Date;
   blocks?: IArticleBlock[];
-  tags?: { _id: string; title?: string }[];
+  tags?: ITag[];
   likes?: IUser[];
   comments?: IComment[];
   isSavedArticle?: boolean;
