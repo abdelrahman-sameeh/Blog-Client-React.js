@@ -14,7 +14,7 @@ body * {
 
 main.main-content {
   flex: 1;
-  margin-top: calc(54px + 18px + 16px);
+  margin-top: 107px
 }
 
 
@@ -93,7 +93,7 @@ main.main-content {
 
 /* dashboard sidebar */
 .dashboard-sidebar {
-  height: 89vh;
+  height: 92vh;
   position: fixed;
   overflow-y: auto;
   overflow-x: hidden;

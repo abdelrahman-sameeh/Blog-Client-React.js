@@ -306,7 +306,7 @@ export const ArticlePage = () => {
           {/* Tags */}
           {article?.tags?.map((item, index) => {
             return (
-              <span key={index} className="ms-2">
+              <span key={index} className="ms-2 fw-bold">
                 #{item?.title}
               </span>
             );

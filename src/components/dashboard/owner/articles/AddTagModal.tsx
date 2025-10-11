@@ -4,6 +4,7 @@ import { useSetRecoilState } from "recoil";
 import { tagsAtom } from "../../../../recoil/tags-atom";
 import notify from "../../../utils/Notify";
 
+
 export const AddTagModal = ({
   show,
   handleClose,
@@ -20,7 +21,7 @@ export const AddTagModal = ({
       return;
     }
     const newData = data.toLowerCase().trim().replace(/\s+/g, "-");
-    setTags((prev: any) => [...prev, { label: newData, value: newData }]);
+    setTags((prev: any) => [...prev, { _id: newData, title: newData, label: newData, value: newData }]);
     setData("");
     handleClose();
   };

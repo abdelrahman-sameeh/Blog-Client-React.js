@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import type { articleBlockTypes } from "../../../../utils/interfaces/article-block-interface";
+import type { articleBlockTypes } from "../../../../../utils/interfaces/article-block-interface";
 import { useSetRecoilState } from "recoil";
-import { articleBlocksAtom } from "../../../../recoil/articles/article-blocks-atom";
+import { articleBlocksAtom } from "../../../../../recoil/articles/article-blocks-atom";
 import CodeMirror from "@uiw/react-codemirror";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";

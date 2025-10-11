@@ -17,9 +17,9 @@ export const Navbar = () => {
   return (
     <div className="navbar border-bottom py-3 border-secondary">
       <div className="w-100 px-4 container-fluid d-flex justify-content-between align-items-center flex-nowrap">
-        <span className="logo d-inline-block fs-2 fw-bold user-select-none text-capitalize">
+        <Link to={"/"} className="logo text-dark text-decoration-none d-inline-block fs-2 fw-bold user-select-none text-capitalize">
           medium mirror
-        </span>
+        </Link>
         <div>
           {user?._id ? (
             <div

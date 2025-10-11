@@ -6,19 +6,19 @@ import { categoriesAtom } from "../../../../recoil/categories-atoms";
 import authAxios from "../../../../api/auth-axios";
 import { ApiEndpoints } from "../../../../api/api-endpoints";
 import { FaPlus } from "react-icons/fa";
-import { AddBlockModal } from "../../../../components/dashboard/owner/articles/AddBlockModal";
+import { AddBlockModal } from "../../../../components/dashboard/owner/articles/create-article/AddBlockModal";
 import { articleBlocksAtom } from "../../../../recoil/articles/article-blocks-atom";
 import { IoCreateOutline } from "react-icons/io5";
 import notify from "../../../../components/utils/Notify";
 import type { IArticleBlock } from "../../../../utils/interfaces/article-block-interface";
 import { tagsAtom } from "../../../../recoil/tags-atom";
 import Select from "react-select";
-import { AddTagModal } from "../../../../components/dashboard/owner/articles/AddTagModal";
 import { PreviewModal } from "../../../../components/dashboard/owner/articles/PreviewModal";
 import { articleAtom } from "../../../../recoil/articles/article-atom";
 import { useLoggedInUser } from "../../../../hooks/useGetLoggedInUser";
 import { useModal } from "../../../../hooks/useModal";
 import type { ITag } from "../../../../utils/interfaces/tag-interface";
+import { AddTagModal } from "../../../../components/dashboard/owner/articles/AddTagModal";
 
 const validation = (
   title: string,
@@ -44,8 +44,8 @@ const validation = (
     setErrors(existErrors);
     return false;
   }
-  
-  return true
+
+  return true;
 };
 
 export const CreateArticlePage = () => {
@@ -76,7 +76,6 @@ export const CreateArticlePage = () => {
 
     setArticleBlocks(newBlocks);
   };
-  
 
   const handleDeleteBlock = (index: number) => {
     const newBlocks = [...articleBlocks];
@@ -86,19 +85,17 @@ export const CreateArticlePage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [categoriesRes, tagsRes] = await Promise.all([
-        authAxios(false, ApiEndpoints.getCategories),
-        authAxios(false, ApiEndpoints.listCreateTag),
-      ]);
-
-      setCategories(categoriesRes.data.data);
-
-      const newTags = tagsRes.data.map((tag: ITag) => ({
-        label: tag.title,
-        value: tag._id,
-      }));
-
-      setTags(newTags);
+      const response = await authAxios(false, ApiEndpoints.getFilters);
+      if (response.status == 200) {
+        setTags(
+          response.data.tags.map((tag: ITag) => ({
+            ...tag,
+            label: tag.title,
+            value: tag._id,
+          }))
+        );
+        setCategories(response.data.categories);
+      }
     };
 
     fetchData();
@@ -157,7 +154,7 @@ export const CreateArticlePage = () => {
       blocks: articleBlocks,
       user,
       likes: [],
-      comments: []
+      comments: [],
     };
 
     setArticle(articleData);

@@ -7,6 +7,7 @@ import { PiHandsClapping } from "react-icons/pi";
 import { FaRegComment, FaRegSave } from "react-icons/fa";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { MdOutlineCategory } from "react-icons/md";
 
 export const PreviewModal = ({
   isOpen,
@@ -33,7 +34,7 @@ export const PreviewModal = ({
           <div className="d-flex justify-content-between align-items-center flex-wrap">
             <h2 className="fw-bold text-capitalize">{article?.title}</h2>
             {article.category?.title && (
-              <h5>Category: {article.category?.title}</h5>
+              <h5><MdOutlineCategory /> {article.category?.title}</h5>
             )}
           </div>
 
@@ -44,7 +45,13 @@ export const PreviewModal = ({
               className="text-dark text-decoration-none d-flex align-items-center gap-2 flex-wrap"
             >
               {article.user?.picture ? (
-                <img src={article.user.picture} />
+                <img
+                  src={article.user?.picture}
+                  alt={article.user?.firstName}
+                  className="rounded-circle object-fit-cover"
+                  width={45}
+                  height={45}
+                />
               ) : (
                 <p className="border m-0 rounded-full px-2 py-2 border-dark text-uppercase">
                   {article.user?.firstName?.[0]}
@@ -82,9 +89,7 @@ export const PreviewModal = ({
               </div>
               <div className="comments text-secondary" title="Comments">
                 <FaRegComment className="fs-5" />
-                <span className="ms-2">
-                  {article.comments?.length}{" "}
-                </span>
+                <span className="ms-2">{article.comments?.length} </span>
               </div>
             </div>
             <div className="text-secondary" title={"Save"}>
@@ -143,7 +148,7 @@ export const PreviewModal = ({
           {/* Tags */}
           {article?.tags?.map((item, index) => {
             return (
-              <span key={index} className="ms-2">
+              <span key={index} className="ms-2 fw-bold">
                 #{item.title}
               </span>
             );

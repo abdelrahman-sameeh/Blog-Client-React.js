@@ -5,10 +5,11 @@ import { MainLayout } from "./layout/MainLayout";
 import { DashboardLayout } from "./layout/DashboardLayout";
 import {IsAuth} from "./hooks/IsAuth";
 import { UserArticlesPage } from "./pages/dashboard-layout/user/articles/UserArticles";
-import { CreateArticlePage } from "./pages/dashboard-layout/user/articles/CreateArticles";
+import { CreateArticlePage } from "./pages/dashboard-layout/user/articles/CreateArticle";
 import { HomePage } from "./pages/main-layout/home/Home";
 import { ArticlePage } from "./pages/main-layout/article/ArticlePage";
 import { SearchArticlesPage } from "./pages/main-layout/article/SearchArticlesPage";
+import { UpdateArticlePage } from "./pages/dashboard-layout/user/articles/UpdateArticlePage";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="user">
             <Route path={'articles'} element={<UserArticlesPage />} />
             <Route path={'create-article'} element={<CreateArticlePage />} />
+            <Route path={'article/:id/update'} element={<UpdateArticlePage />} />
 
           </Route>
 
