@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import authAxios from "../../../../api/auth-axios";
 import { ApiEndpoints } from "../../../../api/api-endpoints";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { articleAtom } from "../../../../recoil/articles/article-atom";
 import { categoriesAtom } from "../../../../recoil/categories-atoms";
 import { tagsAtom } from "../../../../recoil/tags-atom";
@@ -13,11 +13,13 @@ import Select from "react-select";
 import { FaPlus } from "react-icons/fa";
 import type { ITag } from "../../../../utils/interfaces/tag-interface";
 import { useModal } from "../../../../hooks/useModal";
-import { AddTagModal } from "../../../../components/dashboard/owner/articles/AddTagModal";
-import { AddBlockModal } from "../../../../components/dashboard/owner/articles/update-article/AddBlockModal";
-import { PreviewModal } from "../../../../components/dashboard/owner/articles/PreviewModal";
+import { AddTagModal } from "../../../../components/dashboard/user/articles/AddTagModal";
+import { AddBlockModal } from "../../../../components/dashboard/user/articles/update-article-page/AddBlockModal";
+import { PreviewModal } from "../../../../components/dashboard/user/articles/PreviewModal";
 import notify from "../../../../components/utils/Notify";
 import { LoadingButton } from "../../../../components/utils/LoadingButton";
+import { DeleteArticleBlockModal } from "../../../../components/dashboard/user/articles/update-article-page/DeleteArticleBlock";
+import { articleBlockAtom } from "../../../../recoil/articles/article-blocks-atom";
 
 export const UpdateArticlePage = () => {
   const { id } = useParams();
@@ -25,13 +27,15 @@ export const UpdateArticlePage = () => {
     Map<"title" | "blocks" | "category", string>
   >(new Map());
   const [article, setArticle] = useRecoilState(articleAtom);
+  const setArticleBlock = useSetRecoilState(articleBlockAtom);
   const [tags, setTags] = useRecoilState(tagsAtom);
   const [categories, setCategories] = useRecoilState(categoriesAtom);
   const [loadings, setLoadings] = useState<any>({});
 
   const tagModal = useModal();
-  const blockModal = useModal();
+  const createBlockModal = useModal();
   const previewModal = useModal();
+  const deleteBlockModal = useModal();
 
   const fetchArticle = async () => {
     const response = await authAxios(
@@ -71,7 +75,8 @@ export const UpdateArticlePage = () => {
     setArticle((prev) => ({ ...prev, blocks: newBlocks }));
   };
 
-  const updateArticle = async () => {
+  const handleUpdateArticle = async (e: FormEvent) => {
+    e.preventDefault();
     // Validation
     const newErrors = new Map();
     if (!article.title) {
@@ -112,23 +117,27 @@ export const UpdateArticlePage = () => {
       return newState;
     });
 
-    if (response == 200) {
+    if (response.status == 200) {
       notify("updated successfully");
     }
   };
 
   return (
-    <>
+    <Form onSubmit={handleUpdateArticle}>
       <div className="d-flex align-items-start justify-content-between">
         <h3 className="text-capitalize mb-3">Update article</h3>
         <div className="d-flex gap-1">
-          <Button onClick={previewModal.open} variant={"outline-dark"}>
+          <Button
+            type="button"
+            onClick={previewModal.open}
+            variant={"outline-dark"}
+          >
             <CiPlay1 className="fs-5 mb-1" />
             Preview
           </Button>
           <LoadingButton
+            type="submit"
             loading={loadings["update"]}
-            onClick={updateArticle}
             variant={"outline-success"}
           >
             <IoCreateOutline className="fs-5 mb-1" />
@@ -136,7 +145,7 @@ export const UpdateArticlePage = () => {
           </LoadingButton>
         </div>
       </div>
-      <form className="m-0 w-100 p-3 rounded border border-secondary">
+      <div className="m-0 w-100 p-3 rounded border border-secondary">
         <Row className="mx-0 mb-3">
           <Col xs={12} sm={12} md={6}>
             <Form.Group controlId="exampleForm.ControlInput1">
@@ -222,7 +231,7 @@ export const UpdateArticlePage = () => {
           <Button
             type={"button"}
             onClick={() => {
-              blockModal.open();
+              createBlockModal.open();
               errors.has("blocks") && errors.delete("blocks");
             }}
             className={`text-capitalize border ${
@@ -275,18 +284,21 @@ export const UpdateArticlePage = () => {
                     </button>
                   </div>
                   <div className="btn-group me-2">
-                    <button
+                    {/* <button
                       type="button"
                       className="btn btn-sm btn-outline-dark d-flex justify-content-center align-items-center"
                       title={"Update"}
                     >
                       <IoCreateOutline />
-                    </button>
+                    </button> */}
                     <button
                       type="button"
                       title={"Delete"}
                       className="btn btn-sm btn-outline-danger"
-                      // onClick={() => handleDeleteBlock(index)}
+                      onClick={() => {
+                        setArticleBlock(block);
+                        deleteBlockModal.open();
+                      }}
                     >
                       x
                     </button>
@@ -304,30 +316,30 @@ export const UpdateArticlePage = () => {
                   {block.type == "code" || block.type == "text" ? (
                     <p className="mb-0">{block.data}</p>
                   ) : block.type == "image" ? (
-                    <img
-                      width={250}
-                      src={URL.createObjectURL(block.data)}
-                      alt=""
-                    />
+                    <img width={250} src={block.data} alt="" />
                   ) : (
-                    <video
-                      controls
-                      width={250}
-                      src={URL.createObjectURL(block.data)}
-                    ></video>
+                    <video controls width={250} src={block.data}></video>
                   )}
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </form>
+      </div>
       <AddTagModal show={tagModal.isOpen} handleClose={tagModal.close} />
-      <AddBlockModal show={blockModal.isOpen} handleClose={blockModal.close} />
+      <AddBlockModal
+        context={"update-page"}
+        show={createBlockModal.isOpen}
+        handleClose={createBlockModal.close}
+      />
+      <DeleteArticleBlockModal
+        isOpen={deleteBlockModal.isOpen}
+        handleClose={deleteBlockModal.close}
+      />
       <PreviewModal
         isOpen={previewModal.isOpen}
         handleClose={previewModal.close}
       />
-    </>
+    </Form>
   );
 };

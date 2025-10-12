@@ -1,4 +1,4 @@
-import { SearchArticlesComponent } from "../../../components/main-layout/search-articles-page-component/SearchArticlesComponent";
+import { SearchArticlesComponent } from "../../../components/main-layout/search-articles-page/SearchArticlesComponent";
 
 export const SearchArticlesPage = () => {
   return (

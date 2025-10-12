@@ -22,4 +22,7 @@ export const ApiEndpoints = {
   deleteReview: (reviewId: string) => `${mainPath}/review/${reviewId}`,
   getFilters: `${mainPath}/filters`,
   updateArticle: (id: string) => `${mainPath}/article/${id}`,
+  deleteArticleBlock: (articleId: string, articleBlockId: string) => `${mainPath}/article/${articleId}/block/${articleBlockId}`,
+  createArticleBlock: (articleId: string) => `${mainPath}/article/${articleId}/block`,
+
 }

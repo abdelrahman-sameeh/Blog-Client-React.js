@@ -14,9 +14,9 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { MdOutlineCategory } from "react-icons/md";
 import { Button, Form } from "react-bootstrap";
-import { ArticleCommentsComponent } from "../../../components/main-layout/ArticleCommentsComponent";
+import { ArticleCommentsComponent } from "../../../components/main-layout/article-page/ArticleCommentsComponent";
 
-export const ArticlePage = () => {
+export const SpecificArticlePage = () => {
   const { id } = useParams();
   const [article, setArticle] = useRecoilState(articleAtom);
   const navigate = useNavigate();
@@ -130,7 +130,7 @@ export const ArticlePage = () => {
   };
 
   return (
-    <main className="main-content" >
+    <main className="main-content">
       <div className="container">
         <div className="d-flex justify-content-between align-items-center flex-wrap">
           <h2 className="fw-bold text-capitalize">{article?.title}</h2>
@@ -378,9 +378,7 @@ export const ArticlePage = () => {
                     onClick={handleCreateComment}
                     type="submit"
                     className={`text-capitalize`}
-                    disabled={
-                      !comment.length || loading.commentLoading
-                    }
+                    disabled={!comment.length || loading.commentLoading}
                     loading={loading.commentLoading}
                     variant="dark"
                     tabIndex={0}

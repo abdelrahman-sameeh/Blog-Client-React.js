@@ -34,7 +34,9 @@ export const PreviewModal = ({
           <div className="d-flex justify-content-between align-items-center flex-wrap">
             <h2 className="fw-bold text-capitalize">{article?.title}</h2>
             {article.category?.title && (
-              <h5><MdOutlineCategory /> {article.category?.title}</h5>
+              <h5>
+                <MdOutlineCategory /> {article.category?.title}
+              </h5>
             )}
           </div>
 
@@ -101,13 +103,15 @@ export const PreviewModal = ({
 
           {/* Blocks */}
           <div>
-            {article.blocks?.map((articleBlock) => {
+            {article.blocks?.map((articleBlock: any) => {
               let mediaSrc = "";
               if (
                 articleBlock.type == "image" ||
                 articleBlock.type == "video"
               ) {
-                mediaSrc = URL.createObjectURL(articleBlock.data);
+                mediaSrc = articleBlock.data?.startsWith("http")
+                  ? articleBlock.data
+                  : URL.createObjectURL(articleBlock.data);
               }
               return (
                 <div key={articleBlock.order}>

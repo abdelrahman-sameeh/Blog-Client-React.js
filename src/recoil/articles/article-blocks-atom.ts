@@ -4,6 +4,12 @@ import type { IArticleBlock } from "../../utils/interfaces/article-block-interfa
 
 
 export const articleBlocksAtom = atom<IArticleBlock[]>({
-  key: "blocks-atom",
+  key: "article-blocks-atom",
   default: []
+})
+
+
+export const articleBlockAtom = atom<IArticleBlock>({
+  key: "article-block-atom",
+  default: {}
 })

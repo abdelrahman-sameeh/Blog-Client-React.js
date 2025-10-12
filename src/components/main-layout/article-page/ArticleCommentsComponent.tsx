@@ -1,18 +1,19 @@
 import { useRecoilState, useRecoilValue } from "recoil";
-import { articleAtom } from "../../recoil/articles/article-atom";
-import { useLoggedInUser } from "../../hooks/useGetLoggedInUser";
-import { LoadingButton } from "../utils/LoadingButton";
 import { useState, type FormEvent } from "react";
 import { FaHandsClapping, FaRegTrashCan } from "react-icons/fa6";
 import { PiHandsClapping } from "react-icons/pi";
 import { FaRegComment } from "react-icons/fa";
 import { Button, Form } from "react-bootstrap";
-import authAxios from "../../api/auth-axios";
-import { ApiEndpoints } from "../../api/api-endpoints";
-import { articleReplies } from "../../recoil/articles/article-replies-atom";
-import notify from "../utils/Notify";
+import { articleAtom } from "../../../recoil/articles/article-atom";
+import { articleReplies } from "../../../recoil/articles/article-replies-atom";
+import { useModal } from "../../../hooks/useModal";
+import authAxios from "../../../api/auth-axios";
+import { ApiEndpoints } from "../../../api/api-endpoints";
+import notify from "../../utils/Notify";
+import { LoadingButton } from "../../utils/LoadingButton";
+import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
 import { DeleteReviewModalComponent } from "./DeleteReviewComponent";
-import { useModal } from "../../hooks/useModal";
+
 
 const CommentItem = ({ comment, user, level }: any) => {
   const [article, setArticle] = useRecoilState(articleAtom);

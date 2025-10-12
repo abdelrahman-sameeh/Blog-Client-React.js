@@ -1,23 +1,34 @@
 import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import type { articleBlockTypes } from "../../../../../utils/interfaces/article-block-interface";
-import { useSetRecoilState } from "recoil";
+import type {
+  articleBlockTypes,
+} from "../../../../../utils/interfaces/article-block-interface";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { articleBlocksAtom } from "../../../../../recoil/articles/article-blocks-atom";
 import CodeMirror from "@uiw/react-codemirror";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import { articleAtom } from "../../../../../recoil/articles/article-atom";
+import authAxios from "../../../../../api/auth-axios";
+import { ApiEndpoints } from "../../../../../api/api-endpoints";
+import { LoadingButton } from "../../../../utils/LoadingButton";
+import notify from "../../../../utils/Notify";
 
 export const AddBlockModal = ({
+  context = "create-page",
   show,
   handleClose,
 }: {
+  context: "create-page" | "update-page";
   show: boolean;
   handleClose: () => void;
 }) => {
   const [type, setType] = useState<articleBlockTypes>("text");
   const [data, setData] = useState<string | File>("");
+  const [article, setArticle] = useRecoilState(articleAtom);
   const setArticleBlocks = useSetRecoilState(articleBlocksAtom);
   const [codeLang, setCodeLang] = useState("javascript");
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,7 +46,39 @@ export const AddBlockModal = ({
     }
 
     setArticleBlocks((prev) => [...prev, newArticleBlock]);
+    setData("");
     handleClose();
+  };
+
+  const handleCreateBlock = async () => {
+    const formData = new FormData();
+    formData.append("data", data);
+    formData.append("type", type);
+    if (type == "code") {
+      formData.append("lang", codeLang);
+    }
+
+    setLoading(true);
+    const response = await authAxios(
+      true,
+      ApiEndpoints.createArticleBlock(article._id as string),
+      "POST",
+      formData,
+      "multipart/form-data"
+    );
+    setLoading(false);
+
+    if (response.status == 201) {
+      setArticle((prev) => ({
+        ...prev,
+        blocks: [...(prev.blocks || []), response?.data?.data],
+      }));
+      setData("");
+      notify("block created successfully");
+      handleClose();
+    } else {
+      notify("Something went wrong, Please tyr again later", "error");
+    }
   };
 
   return (
@@ -45,7 +88,7 @@ export const AddBlockModal = ({
       size={type === "code" ? "lg" : undefined}
     >
       <Modal.Header closeButton>
-        <Modal.Title>Add new block</Modal.Title>
+        <Modal.Title>Add new block </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form.Group className="mb-3">
@@ -116,9 +159,13 @@ export const AddBlockModal = ({
         <Button variant="outline-danger" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="outline-dark" onClick={handleSave}>
+        <LoadingButton
+          loading={loading}
+          variant="outline-dark"
+          onClick={context == "create-page" ? handleSave : handleCreateBlock}
+        >
           Save
-        </Button>
+        </LoadingButton>
       </Modal.Footer>
     </Modal>
   );

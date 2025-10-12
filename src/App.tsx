@@ -4,10 +4,10 @@ import { LoginPage } from "./pages/auth/login/Login";
 import { MainLayout } from "./layout/MainLayout";
 import { DashboardLayout } from "./layout/DashboardLayout";
 import {IsAuth} from "./hooks/IsAuth";
-import { UserArticlesPage } from "./pages/dashboard-layout/user/articles/UserArticles";
-import { CreateArticlePage } from "./pages/dashboard-layout/user/articles/CreateArticle";
+import { UserArticlesPage } from "./pages/dashboard-layout/user/articles/UserArticlesPage";
+import { CreateArticlePage } from "./pages/dashboard-layout/user/articles/CreateArticlePage";
 import { HomePage } from "./pages/main-layout/home/Home";
-import { ArticlePage } from "./pages/main-layout/article/ArticlePage";
+import { SpecificArticlePage } from "./pages/main-layout/article/SpecificArticlePage";
 import { SearchArticlesPage } from "./pages/main-layout/article/SearchArticlesPage";
 import { UpdateArticlePage } from "./pages/dashboard-layout/user/articles/UpdateArticlePage";
 
@@ -20,7 +20,7 @@ function App() {
       {/* Main layout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/article/:id" element={<ArticlePage />} />
+        <Route path="/article/:id" element={<SpecificArticlePage />} />
         <Route path="/search" element={<SearchArticlesPage />} />
       </Route>
 

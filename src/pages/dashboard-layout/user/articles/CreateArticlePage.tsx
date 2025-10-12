@@ -6,19 +6,19 @@ import { categoriesAtom } from "../../../../recoil/categories-atoms";
 import authAxios from "../../../../api/auth-axios";
 import { ApiEndpoints } from "../../../../api/api-endpoints";
 import { FaPlus } from "react-icons/fa";
-import { AddBlockModal } from "../../../../components/dashboard/owner/articles/create-article/AddBlockModal";
+import { AddBlockModal } from "../../../../components/dashboard/user/articles/create-article-page/AddBlockModal";
 import { articleBlocksAtom } from "../../../../recoil/articles/article-blocks-atom";
 import { IoCreateOutline } from "react-icons/io5";
 import notify from "../../../../components/utils/Notify";
 import type { IArticleBlock } from "../../../../utils/interfaces/article-block-interface";
 import { tagsAtom } from "../../../../recoil/tags-atom";
 import Select from "react-select";
-import { PreviewModal } from "../../../../components/dashboard/owner/articles/PreviewModal";
+import { PreviewModal } from "../../../../components/dashboard/user/articles/PreviewModal";
 import { articleAtom } from "../../../../recoil/articles/article-atom";
 import { useLoggedInUser } from "../../../../hooks/useGetLoggedInUser";
 import { useModal } from "../../../../hooks/useModal";
 import type { ITag } from "../../../../utils/interfaces/tag-interface";
-import { AddTagModal } from "../../../../components/dashboard/owner/articles/AddTagModal";
+import { AddTagModal } from "../../../../components/dashboard/user/articles/AddTagModal";
 
 const validation = (
   title: string,

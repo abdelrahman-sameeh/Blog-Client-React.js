@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useRecoilState } from "recoil";
-import { articleAtom } from "../../recoil/articles/article-atom";
-import { articleReplies } from "../../recoil/articles/article-replies-atom";
-import type { IComment } from "../../utils/interfaces/comment-interface";
+import type { IComment } from "../../../utils/interfaces/comment-interface";
+import { articleAtom } from "../../../recoil/articles/article-atom";
+import { articleReplies } from "../../../recoil/articles/article-replies-atom";
+import authAxios from "../../../api/auth-axios";
+import { ApiEndpoints } from "../../../api/api-endpoints";
+import notify from "../../utils/Notify";
 import { Button, Modal } from "react-bootstrap";
-import { LoadingButton } from "../utils/LoadingButton";
-import authAxios from "../../api/auth-axios";
-import { ApiEndpoints } from "../../api/api-endpoints";
-import notify from "../utils/Notify";
+import { LoadingButton } from "../../utils/LoadingButton";
+
 
 interface IDeleteReviewModalComponent {
   isOpen: boolean;
