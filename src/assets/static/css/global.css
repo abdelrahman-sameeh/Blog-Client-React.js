@@ -125,8 +125,8 @@ main.main-content {
   transition: .3s;
 }
 
-.dashboard-sidebar .dashboard-sidebar-content .link:hover {
-  background-color: #eee;
+.dashboard-sidebar .dashboard-sidebar-content .link:hover, .dashboard-sidebar .dashboard-sidebar-content .link.active {
+  background-color: #d4d4d4;
 }
 
 .dashboard-sidebar.hide .dashboard-sidebar-content .link .link-content {

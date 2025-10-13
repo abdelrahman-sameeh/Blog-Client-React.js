@@ -24,5 +24,6 @@ export const ApiEndpoints = {
   updateArticle: (id: string) => `${mainPath}/article/${id}`,
   deleteArticleBlock: (articleId: string, articleBlockId: string) => `${mainPath}/article/${articleId}/block/${articleBlockId}`,
   createArticleBlock: (articleId: string) => `${mainPath}/article/${articleId}/block`,
+  preferences: `${mainPath}/preferences`
 
 }

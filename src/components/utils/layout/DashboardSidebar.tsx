@@ -1,8 +1,10 @@
-import { Link } from "react-router-dom";
-import { useLoggedInUser } from "../../hooks/useGetLoggedInUser";
+import { NavLink } from "react-router-dom";
 import { MdOutlineArticle } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa";
 import { IoCreateOutline } from "react-icons/io5";
+import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
+import { BiCategory } from "react-icons/bi";
+import { CiBookmark, CiSettings } from "react-icons/ci";
 
 const links = {
   admin: [],
@@ -17,6 +19,21 @@ const links = {
       title: "create article",
       icon: <IoCreateOutline />,
     },
+    {
+      link: "saved-articles",
+      title: "saved articles",
+      icon: <CiBookmark />,
+    },
+    {
+      link: "preferences",
+      title: "your preferences",
+      icon: <BiCategory />
+    },
+    {
+      link: "setting",
+      title: "setting",
+      icon: <CiSettings />
+    }
   ],
 };
 
@@ -45,21 +62,21 @@ export const DashboardSidebar = () => {
                 link: { link: string; title: string; icon: React.ReactNode },
                 index
               ) => (
-                <Link
-                  className="link d-block text-capitalize px-2 py-1 rounded text-dark"
+                <NavLink
+                  className="link d-block text-capitalize px-2  mb-1 text-decoration-none rounded text-dark"
                   key={index}
                   to={`${user.role}/${link.link}`}
                 >
                   <span
-                    title={`${link.title[0].toUpperCase()}${link.title
-                      .slice(1)
-                      .toLowerCase()}`}
+                    title={`${link?.title?.[0]?.toUpperCase()}${link?.title
+                      ?.slice(1)
+                      ?.toLowerCase()}`}
                     className="link-icon fs-4 me-2"
                   >
                     {link.icon}
                   </span>
                   <span className="link-content">{link.title}</span>
-                </Link>
+                </NavLink>
               )
             )}
           </>

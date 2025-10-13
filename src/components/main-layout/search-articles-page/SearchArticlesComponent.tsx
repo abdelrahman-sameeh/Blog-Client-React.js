@@ -26,7 +26,10 @@ import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
 import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { articleAtom, articlesAtom } from "../../../recoil/articles/article-atom";
+import {
+  articleAtom,
+  articlesAtom,
+} from "../../../recoil/articles/article-atom";
 import { DeleteArticleModalComponent } from "./DeleteArticleModalComponent";
 import { useModal } from "../../../hooks/useModal";
 
@@ -160,7 +163,7 @@ export const SearchArticlesComponent = ({
                 <h5 className="text-secondary">No articles found</h5>
               </div>
             ) : (
-              articles.map((article) => {
+              articles?.map((article) => {
                 return (
                   <Card
                     key={article._id}
@@ -215,7 +218,7 @@ export const SearchArticlesComponent = ({
                               title={"Delete"}
                               onClick={() => {
                                 setArticle(article);
-                                deleteArticleModal.open()
+                                deleteArticleModal.open();
                               }}
                               variant="outline-danger"
                               className="p-1 d-flex justify-content-center align-items-center"
@@ -268,7 +271,7 @@ export const SearchArticlesComponent = ({
             )}
 
             {/* create pagination here  */}
-            {pagination?.pages && pagination.pages > 1 && (
+            {pagination?.pages && pagination.pages > 1 ? (
               <div className="d-flex justify-content-center mt-4">
                 <nav>
                   <ul className="pagination pagination-sm mb-0">
@@ -348,7 +351,7 @@ export const SearchArticlesComponent = ({
                   </ul>
                 </nav>
               </div>
-            )}
+            ): <></>}
           </div>
         </Col>
 
@@ -358,7 +361,18 @@ export const SearchArticlesComponent = ({
           md={4}
           className={`filters ${hide ? "hide" : ""} border-start pt-4`}
         >
-          <h5 className="mb-3">Filters</h5>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0">Filters</h5>
+            <Button
+              onClick={() => {
+                setHide(true);
+              }}
+              variant="outline-danger"
+              className="border-circle p-2 py-0 d-block d-md-none"
+            >
+              x
+            </Button>
+          </div>
 
           <CategoryFilterComponent
             selectedCategories={selectedCategories}
@@ -387,7 +401,10 @@ export const SearchArticlesComponent = ({
         </Col>
       </Row>
 
-      <DeleteArticleModalComponent isOpen={deleteArticleModal.isOpen} handleClose={deleteArticleModal.close} />
+      <DeleteArticleModalComponent
+        isOpen={deleteArticleModal.isOpen}
+        handleClose={deleteArticleModal.close}
+      />
     </>
   );
 };
