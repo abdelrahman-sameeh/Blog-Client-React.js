@@ -13,8 +13,11 @@ import { LoadingButton } from "../../../components/utils/LoadingButton";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { MdOutlineCategory } from "react-icons/md";
-import { Button, Form } from "react-bootstrap";
-import { ArticleCommentsComponent } from "../../../components/main-layout/article-page/ArticleCommentsComponent";
+import { Button, Dropdown, Form } from "react-bootstrap";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
+import { useModal } from "../../../hooks/useModal";
+import { ArticleCommentsComponent } from "../../../components/main-layout/specific-article-page/ArticleCommentsComponent";
+import { ReportModal } from "../../../components/main-layout/specific-article-page/ReportModal";
 
 export const SpecificArticlePage = () => {
   const { id } = useParams();
@@ -28,6 +31,7 @@ export const SpecificArticlePage = () => {
   });
   const [comment, setComment] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const reportModal = useModal();
 
   useEffect(() => {
     const getArticleDetails = async () => {
@@ -186,7 +190,7 @@ export const SpecificArticlePage = () => {
 
         <hr />
 
-        {/* Likes and  bookmark */}
+        {/* Likes, bookmark and report article */}
         <div className="d-flex justify-content-between align-items-center">
           <div className="d-flex gap-4">
             <div className="likes">
@@ -234,29 +238,47 @@ export const SpecificArticlePage = () => {
               <span className="ms-2">{article?.comments?.length} </span>
             </div>
           </div>
-          <div
-            className="pointer"
-            title={user._id ? "Save" : "Login to make this action"}
-          >
-            {article.isSavedArticle ? (
-              <LoadingButton
-                loading={loading.bookmarkLoading}
-                disabled={loading.bookmarkLoading || !user._id}
-                onClick={handleUnsave}
-                className="bg-transparent text-dark border-0 p-0 mb-2"
+          <div className="d-flex align-items-center gap-2">
+            <div
+              className="pointer"
+              title={user._id ? "Save" : "Login to make this action"}
+            >
+              {article.isSavedArticle ? (
+                <LoadingButton
+                  loading={loading.bookmarkLoading}
+                  disabled={loading.bookmarkLoading || !user._id}
+                  onClick={handleUnsave}
+                  className="bg-transparent text-dark border-0 p-0"
+                >
+                  <FaBookmark className="fs-4" />
+                </LoadingButton>
+              ) : (
+                <LoadingButton
+                  loading={loading.bookmarkLoading}
+                  disabled={loading.bookmarkLoading || !user._id}
+                  onClick={handleSave}
+                  className="bg-transparent text-dark border-0 p-0"
+                >
+                  <FaRegBookmark className="fs-4" />
+                </LoadingButton>
+              )}
+            </div>
+
+            <Dropdown>
+              <Dropdown.Toggle
+                bsPrefix="custom-toggle"
+                variant="outline-light"
+                className="text-dark bg-none p-1"
+                id="dropdown-basic"
               >
-                <FaBookmark className="fs-4" />
-              </LoadingButton>
-            ) : (
-              <LoadingButton
-                loading={loading.bookmarkLoading}
-                disabled={loading.bookmarkLoading || !user._id}
-                onClick={handleSave}
-                className="bg-transparent text-dark border-0 p-0 mb-2"
-              >
-                <FaRegBookmark className="fs-4" />
-              </LoadingButton>
-            )}
+                <HiOutlineDotsHorizontal />
+              </Dropdown.Toggle>
+              <Dropdown.Menu align="end" className="mt-1">
+                <Dropdown.Item onClick={reportModal.open}>
+                  Report This Article
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
         </div>
 
@@ -316,7 +338,6 @@ export const SpecificArticlePage = () => {
         <hr />
 
         {/* Comments */}
-
         <div className="mb-3">
           <h4>Comments ({article.comments?.length}) </h4>
           {user?._id ? (
@@ -409,6 +430,8 @@ export const SpecificArticlePage = () => {
           <ArticleCommentsComponent />
         </div>
       </div>
+
+      <ReportModal show={reportModal.isOpen} handleClose={reportModal.close} />
     </main>
   );
 };

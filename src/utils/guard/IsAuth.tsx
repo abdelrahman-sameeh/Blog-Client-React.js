@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useLoggedInUser } from "./useGetLoggedInUser";
+import { useLoggedInUser } from "../../hooks/useGetLoggedInUser";
 
 export const IsAuth = () => {
   const { user, loading } = useLoggedInUser();

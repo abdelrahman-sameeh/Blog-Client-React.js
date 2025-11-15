@@ -7,7 +7,13 @@ import { BiCategory } from "react-icons/bi";
 import { CiBookmark, CiSettings } from "react-icons/ci";
 
 const links = {
-  admin: [],
+  admin: [
+    {
+      link: "articles-reports",
+      title: "Articles Reports",
+      icon: <MdOutlineArticle />,
+    },    
+  ],
   user: [
     {
       link: "articles",

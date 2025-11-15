@@ -24,6 +24,10 @@ export const ApiEndpoints = {
   updateArticle: (id: string) => `${mainPath}/article/${id}`,
   deleteArticleBlock: (articleId: string, articleBlockId: string) => `${mainPath}/article/${articleId}/block/${articleBlockId}`,
   createArticleBlock: (articleId: string) => `${mainPath}/article/${articleId}/block`,
-  preferences: `${mainPath}/preferences`
-
+  preferences: `${mainPath}/preferences`,
+  getReportsSummary: (query: string = '') => `${mainPath}/reports/summary${query}`,
+  getReportReasons: `${mainPath}/reasons`,
+  createReport: (articleId: string) => `${mainPath}/article/${articleId}/report`,
+  getArticleReport: (articleId: string) => `${mainPath}/article/${articleId}/reports`,
+  changeReportStatus: (reportId: string) => `${mainPath}/report/${reportId}`
 }

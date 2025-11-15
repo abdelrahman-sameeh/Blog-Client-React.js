@@ -3,7 +3,6 @@ import { RegisterPage } from "./pages/auth/register/Register";
 import { LoginPage } from "./pages/auth/login/Login";
 import { MainLayout } from "./layout/MainLayout";
 import { DashboardLayout } from "./layout/DashboardLayout";
-import { IsAuth } from "./hooks/IsAuth";
 import { UserArticlesPage } from "./pages/dashboard-layout/user/articles/UserArticlesPage";
 import { CreateArticlePage } from "./pages/dashboard-layout/user/articles/CreateArticlePage";
 import { HomePage } from "./pages/main-layout/home/Home";
@@ -12,6 +11,9 @@ import { SearchArticlesPage } from "./pages/main-layout/article/SearchArticlesPa
 import { UpdateArticlePage } from "./pages/dashboard-layout/user/articles/UpdateArticlePage";
 import { HasPreferences } from "./utils/guard/HasPreferences";
 import { PreferencesPage } from "./pages/dashboard-layout/user/settings/PreferencesPage";
+import { IsAuth } from "./utils/guard/IsAuth";
+import { ReportsSummaryPage } from "./pages/dashboard-layout/admin/ReportsSummaryPage";
+import ArticleReportsPage from "./pages/dashboard-layout/admin/ArticleReportsPage";
 
 function App() {
   return (
@@ -37,7 +39,10 @@ function App() {
         <Route element={<IsAuth />}>
           <Route path="/dashboard" element={<DashboardLayout />}>
             {/* Admin Role */}
-            <Route path="admin"></Route>
+            <Route path="admin">
+              <Route path={"articles-reports"} element={<ReportsSummaryPage />} />
+              <Route path={"article/:id/reports"} element={<ArticleReportsPage />} />
+            </Route>
 
             {/* User role */}
             <Route path="user">
