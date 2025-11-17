@@ -21,12 +21,6 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      <Route element={<IsAuth />}>
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route path={"user/preferences"} element={<PreferencesPage />} />
-        </Route>
-      </Route>
-
       <Route element={<HasPreferences />}>
         {/* Main layout */}
         <Route element={<MainLayout />}>
@@ -40,8 +34,14 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />}>
             {/* Admin Role */}
             <Route path="admin">
-              <Route path={"articles-reports"} element={<ReportsSummaryPage />} />
-              <Route path={"article/:id/reports"} element={<ArticleReportsPage />} />
+              <Route
+                path={"articles-reports"}
+                element={<ReportsSummaryPage />}
+              />
+              <Route
+                path={"article/:id/reports"}
+                element={<ArticleReportsPage />}
+              />
             </Route>
 
             {/* User role */}
@@ -52,6 +52,7 @@ function App() {
                 path={"article/:id/update"}
                 element={<UpdateArticlePage />}
               />
+              <Route path={"preferences"} element={<PreferencesPage />} />
             </Route>
           </Route>
         </Route>

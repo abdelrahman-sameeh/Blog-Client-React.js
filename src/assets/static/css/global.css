@@ -125,7 +125,8 @@ main.main-content {
   transition: .3s;
 }
 
-.dashboard-sidebar .dashboard-sidebar-content .link:hover, .dashboard-sidebar .dashboard-sidebar-content .link.active {
+.dashboard-sidebar .dashboard-sidebar-content .link:hover,
+.dashboard-sidebar .dashboard-sidebar-content .link.active {
   background-color: #d4d4d4;
 }
 
@@ -212,4 +213,33 @@ main.main-content {
   }
 
 
+}
+
+
+/*  */
+.custom-container {
+  width: 55%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+@media (max-width: 991px) {
+  .custom-container {
+    width: 60%;
+  }
+}
+
+
+@media (max-width: 767px) {
+  .custom-container {
+    width: 90%;
+  }
+}
+
+
+@media (max-width: 490px) {
+  .custom-container {
+    width: 96%;
+  }
 }

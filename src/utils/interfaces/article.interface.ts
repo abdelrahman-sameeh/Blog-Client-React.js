@@ -16,5 +16,10 @@ export interface IArticle {
   likes?: IUser[];
   comments?: IComment[];
   isSavedArticle?: boolean;
+  articleCoverImage?: string
+  blocksData?: {
+    image?: string;
+    text?: string;
+  }
 }
 

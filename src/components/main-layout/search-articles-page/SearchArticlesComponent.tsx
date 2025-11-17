@@ -1,17 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  Form,
-  InputGroup,
-  Row,
-} from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { CiSearch } from "react-icons/ci";
-import { FaHandsClapping } from "react-icons/fa6";
-import { IoCreateOutline, IoFilterOutline } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { IoFilterOutline } from "react-icons/io5";
 import { CategoryFilterComponent } from "./CategoryFilterComponent";
 import { TagsFilterComponent } from "./TagsFilterComponent";
 import { useRecoilState, useSetRecoilState } from "recoil";
@@ -24,14 +14,11 @@ import type { ITag } from "../../../utils/interfaces/tag-interface";
 import { useDebounce } from "../../../hooks/useDebounce";
 import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
-import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
-import { FaRegTrashAlt } from "react-icons/fa";
-import {
-  articleAtom,
-  articlesAtom,
-} from "../../../recoil/articles/article-atom";
+import { articlesAtom } from "../../../recoil/articles/article-atom";
 import { DeleteArticleModalComponent } from "./DeleteArticleModalComponent";
 import { useModal } from "../../../hooks/useModal";
+import { PaginationComp } from "../../utils/PaginationComp";
+import { ArticleCardComponent } from "./ArticleCardComponent";
 
 export const SearchArticlesComponent = ({
   mine = false,
@@ -47,10 +34,9 @@ export const SearchArticlesComponent = ({
   const [selectedCategories, setSelectedCategories] = useState<ICategory[]>([]);
   const [selectedTags, setSelectedTags] = useState<ITag[]>([]);
   const [numberOfResults, setNumberOfResults] = useState(5);
-  const { user } = useLoggedInUser();
   const debouncedSearch = useDebounce(search);
   const [loadings, setLoadings] = useState<Record<string, boolean>>({});
-  const setArticle = useSetRecoilState(articleAtom);
+  const [page, setPage] = useState(1);
 
   const deleteArticleModal = useModal();
 
@@ -79,8 +65,8 @@ export const SearchArticlesComponent = ({
         query += `tags[]=${tag._id}&`;
       }
     }
-    if (pagination.page) {
-      query += `page=${pagination.page}&`;
+    if (page) {
+      query += `page=${page}&`;
     }
 
     query = query.slice(0, -1);
@@ -112,7 +98,7 @@ export const SearchArticlesComponent = ({
     debouncedSearch,
     selectedCategories,
     selectedTags,
-    pagination.page,
+    page,
     numberOfResults,
   ]);
 
@@ -128,7 +114,7 @@ export const SearchArticlesComponent = ({
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                setPagination((prev) => ({ ...prev, page: 1 }));
+                setPage(1);
               }}
               className="shadow-none search-input"
               placeholder="Search article"
@@ -165,193 +151,25 @@ export const SearchArticlesComponent = ({
             ) : (
               articles?.map((article) => {
                 return (
-                  <Card
+                  <ArticleCardComponent
                     key={article._id}
-                    className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden"
-                  >
-                    <Card.Body>
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div className="d-flex align-items-center mb-3 gap-2">
-                          {article?.user?.picture ? (
-                            <img
-                              src={article?.user?.picture}
-                              alt={article?.user?.username}
-                              className="rounded-circle object-fit-cover"
-                              width={45}
-                              height={45}
-                            />
-                          ) : (
-                            <div className="user-picture-placeholder border p-2 rounded-circle">
-                              {article?.user?.firstName
-                                ?.charAt(0)
-                                .toUpperCase()}
-                              {article?.user?.lastName?.charAt(0).toUpperCase()}
-                            </div>
-                          )}
-                          <div>
-                            <h6 className="mb-0">
-                              {article?.user?.firstName}{" "}
-                              {article?.user?.lastName}
-                            </h6>
-                            <small className="text-muted">
-                              @{article?.user?.username}
-                            </small>
-                          </div>
-                        </div>
-
-                        {/* controls  */}
-                        {user?._id == article?.user?._id ? (
-                          <div className="d-flex gap-1">
-                            <Link
-                              to={`/dashboard/user/article/${article._id}/update`}
-                            >
-                              <Button
-                                variant="outline-dark"
-                                title="Update"
-                                className="p-1 d-flex justify-content-center align-items-center"
-                              >
-                                <IoCreateOutline className="fs-5" />
-                              </Button>
-                            </Link>
-
-                            <Button
-                              title={"Delete"}
-                              onClick={() => {
-                                setArticle(article);
-                                deleteArticleModal.open();
-                              }}
-                              variant="outline-danger"
-                              className="p-1 d-flex justify-content-center align-items-center"
-                            >
-                              <FaRegTrashAlt />{" "}
-                            </Button>
-                          </div>
-                        ) : (
-                          <></>
-                        )}
-                      </div>
-
-                      <h4 className="fw-bold mb-2 text-truncate-2">
-                        {article.title}
-                      </h4>
-
-                      <Badge bg="secondary" className="mb-2">
-                        {article?.category?.title}
-                      </Badge>
-
-                      <div className="mb-3">
-                        {article?.tags?.map((tag) => (
-                          <Badge
-                            key={tag._id}
-                            bg="light"
-                            text="dark"
-                            className="me-2 border"
-                          >
-                            #{tag.title}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div className="d-flex align-items-center">
-                          <FaHandsClapping className="me-1 fs-5" />
-                          <span>{article?.likes?.length}</span>
-                        </div>
-                        <Link
-                          to={`/article/${article._id}`}
-                          className="btn btn-outline-primary btn-sm rounded-pill"
-                        >
-                          Read more →
-                        </Link>
-                      </div>
-                    </Card.Body>
-                  </Card>
+                    article={article}
+                    deleteArticleModal={deleteArticleModal}
+                  />
                 );
               })
             )}
 
             {/* create pagination here  */}
             {pagination?.pages && pagination.pages > 1 ? (
-              <div className="d-flex justify-content-center mt-4">
-                <nav>
-                  <ul className="pagination pagination-sm mb-0">
-                    {/* زر Previous */}
-                    <li
-                      className={`page-item ${
-                        pagination.page === 1 ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() => {
-                          if (pagination.page && pagination.page > 1) {
-                            const newPage = pagination.page - 1;
-                            setPagination((prev) => ({
-                              ...prev,
-                              page: newPage,
-                            }));
-                          }
-                        }}
-                      >
-                        Previous
-                      </button>
-                    </li>
-
-                    {/* أرقام الصفحات */}
-                    {Array.from(
-                      { length: pagination.pages },
-                      (_, i) => i + 1
-                    ).map((num) => (
-                      <li
-                        key={num}
-                        className={`page-item ${
-                          pagination.page === num ? "active" : ""
-                        }`}
-                      >
-                        <button
-                          className="page-link"
-                          onClick={() => {
-                            if (num !== pagination.page) {
-                              setPagination((prev) => ({
-                                ...prev,
-                                page: num,
-                              }));
-                            }
-                          }}
-                        >
-                          {num}
-                        </button>
-                      </li>
-                    ))}
-
-                    {/* زر Next */}
-                    <li
-                      className={`page-item ${
-                        pagination.page === pagination.pages ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() => {
-                          if (
-                            pagination.page &&
-                            pagination.page < (pagination.pages || 1)
-                          ) {
-                            const newPage = pagination.page + 1;
-                            setPagination((prev) => ({
-                              ...prev,
-                              page: newPage,
-                            }));
-                          }
-                        }}
-                      >
-                        Next
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            ): <></>}
+              <PaginationComp
+                page={pagination.page}
+                pages={pagination.pages}
+                setPage={setPage}
+              />
+            ) : (
+              <></>
+            )}
           </div>
         </Col>
 
@@ -394,7 +212,10 @@ export const SearchArticlesComponent = ({
                 id={`results-${num}`}
                 label={`${num} per page`}
                 checked={numberOfResults === num}
-                onChange={() => setNumberOfResults(num)}
+                onChange={() => {
+                  setPage(1);
+                  setNumberOfResults(num);
+                }}
               />
             ))}
           </Form>

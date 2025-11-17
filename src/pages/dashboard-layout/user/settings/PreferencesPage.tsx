@@ -56,6 +56,7 @@ export const PreferencesPage = () => {
 
     if (response.status === 200) {
       notify("Your preferences have been saved successfully.", "success");
+      sessionStorage.setItem("user", JSON.stringify(response?.data?.data?.user))
     } else {
       notify("Something went wrong. Please try again later.", "error");
     }
@@ -83,6 +84,7 @@ export const PreferencesPage = () => {
       notify("Your preferences have been saved successfully.", "success");
       setSelectedCategories(response?.data?.data?.preferences);
       setUser(response?.data?.data);
+      sessionStorage.setItem("user", JSON.stringify(response?.data?.data))
     } else {
       notify("Something went wrong. Please try again later.", "error");
     }

@@ -1,20 +1,21 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useLoggedInUser } from "../../hooks/useGetLoggedInUser"
-import { Spinner } from "react-bootstrap";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useLoggedInUser } from "../../hooks/useGetLoggedInUser";
 
 export const HasPreferences = () => {
-  const {user, loading} = useLoggedInUser(true)
-
-  if (loading) {
-    return <div className="d-flex justify-content-center align-item-center py-5">
-      <Spinner animation="border" />
-    </div>;
+  const { user, loading } = useLoggedInUser();
+  const location = useLocation();
+  const skipRoutes = ["/dashboard/user/preferences"];
+  
+  if (skipRoutes.includes(location.pathname)) {
+    return <Outlet />;
   }
 
-  if((!user?._id || user.role=="admin" || user.preferences?.length) && !loading){
-    return <Outlet />
-  }else if(!loading){
-    return <Navigate to={"/dashboard/user/preferences"} />
+  if (
+    (!user?._id || user.role == "admin" || user.preferences?.length) &&
+    !loading
+  ) {
+    return <Outlet />;
+  } else if (!loading) {
+    return <Navigate to={"/dashboard/user/preferences"} />;
   }
-
-}
+};

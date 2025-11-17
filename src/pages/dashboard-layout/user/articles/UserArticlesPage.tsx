@@ -15,7 +15,7 @@ export const UserArticlesPage = () => {
         </Link>
       </div>
 
-      {/* User Article */}
+      {/* User Articles */}
       <SearchArticlesComponent mine={true} />
     </div>
   );

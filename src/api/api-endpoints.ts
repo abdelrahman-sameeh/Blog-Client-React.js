@@ -8,6 +8,7 @@ export const ApiEndpoints = {
   getCategories: `${mainPath}/category`,
   listCreateArticle: (query: string = "") => `${mainPath}/article?${query}`,
   listMineArticle: (query: string = "") => `${mainPath}/mine/article?${query}`,
+  getHomePageArticles:(query: string = "") => `${mainPath}/articles/home${query}`,
   listCreateTag: `${mainPath}/tag`,
   getDeleteArticle: (id: string) => `${mainPath}/article/${id}`,
   likeArticle: (articleId: string) => `${mainPath}/article/${articleId}/like`,
