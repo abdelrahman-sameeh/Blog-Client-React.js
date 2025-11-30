@@ -14,7 +14,7 @@ import { CiPlay1 } from "react-icons/ci";
 import { useModal } from "../../../hooks/useModal";
 import { PreviewModal } from "../../../components/dashboard/user/articles/PreviewModal";
 
-const ArticleReportsPage = () => {
+export const ArticleReportsPage = () => {
   const { id } = useParams();
   const setArticle = useSetRecoilState(articleAtom);
   const [reports, setReports] = useState<IReport[]>([]);
@@ -162,4 +162,3 @@ const ArticleReportsPage = () => {
   );
 };
 
-export default ArticleReportsPage;

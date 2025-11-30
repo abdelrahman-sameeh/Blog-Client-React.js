@@ -8,7 +8,7 @@ export const ApiEndpoints = {
   getCategories: `${mainPath}/category`,
   listCreateArticle: (query: string = "") => `${mainPath}/article?${query}`,
   listMineArticle: (query: string = "") => `${mainPath}/mine/article?${query}`,
-  getHomePageArticles:(query: string = "") => `${mainPath}/articles/home${query}`,
+  getHomePageArticles: (query: string = "") => `${mainPath}/articles/home${query}`,
   listCreateTag: `${mainPath}/tag`,
   getDeleteArticle: (id: string) => `${mainPath}/article/${id}`,
   likeArticle: (articleId: string) => `${mainPath}/article/${articleId}/like`,
@@ -30,5 +30,13 @@ export const ApiEndpoints = {
   getReportReasons: `${mainPath}/reasons`,
   createReport: (articleId: string) => `${mainPath}/article/${articleId}/report`,
   getArticleReport: (articleId: string) => `${mainPath}/article/${articleId}/reports`,
-  changeReportStatus: (reportId: string) => `${mainPath}/report/${reportId}`
+  changeReportStatus: (reportId: string) => `${mainPath}/report/${reportId}`,
+  getWriter: (id: string) => `${mainPath}/writer/${id}`,
+  follow: `${mainPath}/follow`,
+  unfollow: `${mainPath}/unfollow`,
+  block: (id: string) => `${mainPath}/block/user/${id}`,
+  unblock: (id: string) => `${mainPath}/unblock/user/${id}`,
+  getArticlesByWriter: (writerId: string, query: any) => `/api/v1/user/${writerId}/articles${query}`
+
+
 }

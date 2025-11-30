@@ -28,7 +28,7 @@ export const AuthHome = () => {
     if (radioValue === "forYou") {
       const response = await authAxios(
         true,
-        ApiEndpoints.getHomePageArticles(`?limit=2&page=${page}`)
+        ApiEndpoints.getHomePageArticles(`?limit=3&page=${page}`)
       );
       responseData = response?.data?.data?.articles || [];
     } else {

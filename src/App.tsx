@@ -13,7 +13,8 @@ import { HasPreferences } from "./utils/guard/HasPreferences";
 import { PreferencesPage } from "./pages/dashboard-layout/user/settings/PreferencesPage";
 import { IsAuth } from "./utils/guard/IsAuth";
 import { ReportsSummaryPage } from "./pages/dashboard-layout/admin/ReportsSummaryPage";
-import ArticleReportsPage from "./pages/dashboard-layout/admin/ArticleReportsPage";
+import { ArticleReportsPage } from "./pages/dashboard-layout/admin/ArticleReportsPage";
+import { WriterProfilePage } from "./pages/main-layout/writer/WriterProfilePage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/article/:id" element={<SpecificArticlePage />} />
           <Route path="/search" element={<SearchArticlesPage />} />
+          <Route path="/writer/:id" element={<WriterProfilePage />} />
         </Route>
 
         {/* Dashboard layout */}

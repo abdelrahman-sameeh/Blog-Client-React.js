@@ -65,7 +65,7 @@ export const ArticleCardComponent = ({
                 title={"Delete"}
                 onClick={() => {
                   setArticle(article);
-                  deleteArticleModal.open();
+                  deleteArticleModal?.open();
                 }}
                 variant="outline-danger"
                 className="p-1 d-flex justify-content-center align-items-center"
