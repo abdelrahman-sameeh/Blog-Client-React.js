@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { MdOutlineNoteAlt } from "react-icons/md";
 import { AvatarDropdown } from "../navbar/AvatarDropdown";
 import { useRef } from "react";
+import { FaUserFriends } from "react-icons/fa";
 
 export const Sidebar = () => {
   const sidebar = useRef<HTMLDivElement>(null);
@@ -13,10 +14,7 @@ export const Sidebar = () => {
   };
 
   return (
-    <div
-      ref={sidebar}
-      className={`sidebar d-none shadow`}
-    >
+    <div ref={sidebar} className={`sidebar d-none shadow`}>
       <div className="container mt-4">
         <div className="d-flex align-items-center justify-content-between">
           <span className="fs-4 text-capitalize fw-bold cursor-default user-select-none">
@@ -37,6 +35,12 @@ export const Sidebar = () => {
         >
           <MdOutlineNoteAlt className="fs-3" />
           write
+        </Link>
+        <Link
+          to={"/friend-requests"}
+          className="text-dark text-decoration-none text-capitalize d-flex gap-1"
+        >
+          <FaUserFriends className="fs-4" />
         </Link>
         <AvatarDropdown />
       </div>

@@ -148,7 +148,7 @@ export const SpecificArticlePage = () => {
         {/* Writer */}
         <div className="d-flex align-items-center gap-2 flex-wrap">
           <Link
-            to="user"
+            to={`/writer/${article?.user?._id}`}
             className="text-dark text-decoration-none d-flex align-items-center gap-2 flex-wrap"
           >
             {article?.user?.picture ? (
@@ -164,7 +164,7 @@ export const SpecificArticlePage = () => {
             ) : (
               <p
                 style={{ width: "50px", height: "50px" }}
-                className="d-flex justify-content-center align-items-center border m-0 rounded-full border-dark text-uppercase"
+                className="d-flex justify-content-center align-items-center border m-0 rounded-circle border-dark text-uppercase"
               >
                 {article?.user?.firstName?.[0]}
                 {article?.user?.lastName?.[0]}{" "}
@@ -354,7 +354,7 @@ export const SpecificArticlePage = () => {
                     src={user.picture}
                   />
                 ) : (
-                  <p className="border m-0 rounded-full px-2 py-2 border-dark text-uppercase">
+                  <p className="border m-0 rounded-circle px-2 py-2 border-dark text-uppercase">
                     {user?.firstName?.[0]}
                     {user?.lastName?.[0]}{" "}
                   </p>

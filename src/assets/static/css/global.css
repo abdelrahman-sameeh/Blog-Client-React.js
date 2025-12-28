@@ -243,3 +243,10 @@ main.main-content {
     width: 96%;
   }
 }
+
+
+/* user-profile-stats */
+.user-profile-stats .image:hover img{
+  filter: opacity(0.5);
+  transition: ease-in-out .2s;
+}

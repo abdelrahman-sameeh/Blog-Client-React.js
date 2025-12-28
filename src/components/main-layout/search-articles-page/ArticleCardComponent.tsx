@@ -26,24 +26,34 @@ export const ArticleCardComponent = ({
       <Card.Body>
         <div className="d-flex justify-content-between align-items-start">
           <div className="d-flex align-items-center mb-3 gap-2">
-            {article?.user?.picture ? (
-              <img
-                src={article?.user?.picture}
-                alt={article?.user?.username}
-                className="rounded-circle object-fit-cover"
-                width={45}
-                height={45}
-              />
-            ) : (
-              <div className="user-picture-placeholder border p-2 rounded-circle">
-                {article?.user?.firstName?.charAt(0)?.toUpperCase()}
-                {article?.user?.lastName?.charAt(0)?.toUpperCase()}
-              </div>
-            )}
+            <Link
+              className={"text-decoration-none text-dark"}
+              to={`/writer/${article?.user?._id}`}
+            >
+              {article?.user?.picture ? (
+                <img
+                  src={article?.user?.picture}
+                  alt={article?.user?.username}
+                  className="rounded-circle object-fit-cover"
+                  width={45}
+                  height={45}
+                />
+              ) : (
+                <div className="user-picture-placeholder border p-2 rounded-circle">
+                  {article?.user?.firstName?.charAt(0)?.toUpperCase()}
+                  {article?.user?.lastName?.charAt(0)?.toUpperCase()}
+                </div>
+              )}
+            </Link>
             <div>
-              <h6 className="mb-0">
-                {article?.user?.firstName} {article?.user?.lastName}
-              </h6>
+              <Link
+                className={"text-decoration-none text-dark"}
+                to={`/writer/${article?.user?._id}`}
+              >
+                <h6 className="mb-0">
+                  {article?.user?.firstName} {article?.user?.lastName}
+                </h6>
+              </Link>
               <small className="text-muted">@{article?.user?.username}</small>
             </div>
           </div>

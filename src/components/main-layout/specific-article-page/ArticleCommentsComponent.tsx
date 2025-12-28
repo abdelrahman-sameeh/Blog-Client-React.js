@@ -14,7 +14,6 @@ import { LoadingButton } from "../../utils/LoadingButton";
 import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
 import { DeleteReviewModalComponent } from "./DeleteReviewComponent";
 
-
 const CommentItem = ({ comment, user, level }: any) => {
   const [article, setArticle] = useRecoilState(articleAtom);
   const [replies, setReplies] = useRecoilState(articleReplies);
@@ -177,7 +176,7 @@ const CommentItem = ({ comment, user, level }: any) => {
             ) : (
               <p
                 style={{ width: "40px", height: "40px" }}
-                className="d-flex justify-content-center align-items-center border m-0 rounded-full border-dark text-uppercase"
+                className="d-flex justify-content-center align-items-center border m-0 rounded-circle border-dark text-uppercase"
               >
                 {comment?.author?.firstName?.[0]}
                 {comment?.author?.lastName?.[0]}

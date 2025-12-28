@@ -20,31 +20,35 @@ export const WriterProfilePage = () => {
   const [relationship, setRelationship] = useState<{
     followers: string[];
     blockers: string[];
+    friendRequest: object;
   }>({
     followers: [],
     blockers: [],
+    friendRequest: {},
   });
   const [loadings, setLoadings] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    const fetchWriter = async (id: string) => {
-      const response = await authAxios(
-        user?._id ? true : false,
-        ApiEndpoints.getWriter(id)
-      );
-      setWriter(response?.data?.writer);
-      setRelationship({
-        followers: response?.data?.followers,
-        blockers: response?.data?.blockers,
-      });
-    };
-    fetchWriter(id as string);
-  }, [user]);
-
   const [articles, setArticles] = useState<IArticle[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const deleteArticleModal = useModal();
+
+  const fetchWriter = async (id: string) => {
+    const response = await authAxios(
+      user?._id ? true : false,
+      ApiEndpoints.getWriter(id)
+    );
+    setWriter(response?.data?.writer);
+    setRelationship((prev) => ({
+      ...prev,
+      followers: response?.data?.followers,
+      blockers: response?.data?.blockers,
+      friendRequest: response?.data?.friendRequest,
+    }));
+  };
+
+  useEffect(() => {
+    fetchWriter(id as string);
+  }, [user]);
 
   const fetchArticles = async () => {
     let responseData: any = [];
@@ -174,22 +178,41 @@ export const WriterProfilePage = () => {
     });
   };
 
+  const handleSendCancelRequest = async (token: "send" | "cancel") => {
+    const data = {
+      receiver: id,
+    };
+
+    setLoadings((prev) => ({ ...prev, sendRequest: true }));
+    const friendRequest = await authAxios(
+      true,
+      ApiEndpoints.sendCancelGetRequest(),
+      token == "send" ? "POST" : "DELETE",
+      data
+    );
+    setLoadings((prev) => ({ ...prev, sendRequest: false }));
+    setRelationship((prev) => ({
+      ...prev,
+      friendRequest: token == "send" ? friendRequest : {},
+    }));
+  };
+
   return (
     <main className="main-content">
       <div className="custom-container">
         <div className=" border-bottom border-secondary pb-3">
           <div className="d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center gap-2">
-              {writer.picture ? (
+              {writer?.picture ? (
                 <Image
-                  src={writer.picture}
-                  className="object-fit-cover rounded-full user-select-none"
+                  src={writer?.picture}
+                  className="object-fit-cover rounded-circle user-select-none"
                   width={100}
                   height={100}
                 />
               ) : (
                 <span
-                  className="border rounded-full d-flex justify-content-center align-items-center fs-1 user-select-none bg-secondary text-light"
+                  className="border rounded-circle d-flex justify-content-center align-items-center fs-1 user-select-none bg-secondary text-light"
                   style={{ width: "100px", height: "100px" }}
                 >
                   {writer.firstName?.[0]}{" "}
@@ -205,7 +228,30 @@ export const WriterProfilePage = () => {
             {/* controls */}
 
             {user?._id !== writer?._id ? (
-              user?._id ? (
+              writer?.visibility == "private" &&
+              user?._id &&
+              !relationship?.followers?.includes(user?._id as string) &&
+              !relationship?.blockers?.includes(user?._id as string) ? (
+                <div>
+                  {Object.keys(relationship?.friendRequest || {}).length ? (
+                    <LoadingButton
+                      loading={loadings?.sendRequest}
+                      onClick={() => handleSendCancelRequest("cancel")}
+                      variant="outline-danger"
+                    >
+                      Cancel Request
+                    </LoadingButton>
+                  ) : (
+                    <LoadingButton
+                      loading={loadings?.sendRequest}
+                      onClick={() => handleSendCancelRequest("send")}
+                      variant="outline-primary"
+                    >
+                      Send Request
+                    </LoadingButton>
+                  )}
+                </div>
+              ) : user?._id ? (
                 <div className="d-flex gap-2">
                   {/* لو مش تابعين ومفيش block */}
                   {!relationship?.followers?.length &&
@@ -295,7 +341,13 @@ export const WriterProfilePage = () => {
           </p>
         </div>
 
-        {relationship?.blockers?.length ? (
+        {writer?.visibility == "private" &&
+        !relationship.followers?.includes(user?._id as string) &&
+        !relationship.blockers?.includes(user?._id as string) ? (
+          <div className="text-center p-4 alert alert-success rounded mt-3">
+            This writer account is private.
+          </div>
+        ) : relationship?.blockers?.length ? (
           <div className="text-center p-4 alert alert-danger rounded mt-3">
             You are blocked from viewing this writer's articles.
           </div>

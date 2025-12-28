@@ -36,7 +36,15 @@ export const ApiEndpoints = {
   unfollow: `${mainPath}/unfollow`,
   block: (id: string) => `${mainPath}/block/user/${id}`,
   unblock: (id: string) => `${mainPath}/unblock/user/${id}`,
-  getArticlesByWriter: (writerId: string, query: any) => `/api/v1/user/${writerId}/articles${query}`
-
-
+  getArticlesByWriter: (writerId: string, query: any) => `/api/v1/user/${writerId}/articles${query}`,
+  sendCancelGetRequest: (query: string = "") => `${mainPath}/friend-request${query}`,
+  acceptRejectFriendRequest: (id: string, token: "accept" | "reject") => `${mainPath}/friend-request/${id}/${token}`,
+  getUserProfileStats: `${mainPath}/profile-stats`,
+  changeProfileImage: `${mainPath}/change-profile-image`,
+  updateProfileInfo: `${mainPath}/profile-info`,
+  getFollowers: (query: string = "") => `${mainPath}/followers${query}`,
+  getFollowing: (query: string = "") => `${mainPath}/following${query}`,
+  getFollowersOnly: (query: string = "") => `${mainPath}/followers-only${query}`,
+  getFollowingOnly: (query: string = "") => `${mainPath}/following-only${query}`,
+  pendingRequestsSent: (query: string = "") => `${mainPath}/pending-requests-sent${query}`,
 }

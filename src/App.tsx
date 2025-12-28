@@ -15,6 +15,9 @@ import { IsAuth } from "./utils/guard/IsAuth";
 import { ReportsSummaryPage } from "./pages/dashboard-layout/admin/ReportsSummaryPage";
 import { ArticleReportsPage } from "./pages/dashboard-layout/admin/ArticleReportsPage";
 import { WriterProfilePage } from "./pages/main-layout/writer/WriterProfilePage";
+import { FriendRequestPage } from "./pages/main-layout/writer/FriendRequestPage";
+import { UserProfileStatsPage } from "./pages/dashboard-layout/shared/UserProfileStatsPage";
+import { SettingPage } from "./pages/dashboard-layout/shared/SettingPage";
 
 function App() {
   return (
@@ -29,6 +32,7 @@ function App() {
           <Route path="/article/:id" element={<SpecificArticlePage />} />
           <Route path="/search" element={<SearchArticlesPage />} />
           <Route path="/writer/:id" element={<WriterProfilePage />} />
+          <Route path="/friend-requests" element={<FriendRequestPage />} />
         </Route>
 
         {/* Dashboard layout */}
@@ -55,6 +59,12 @@ function App() {
                 element={<UpdateArticlePage />}
               />
               <Route path={"preferences"} element={<PreferencesPage />} />
+            </Route>
+
+            {/* Shared pages accessible by all authenticated users */}
+            <Route path="shared">
+              <Route path="profile" element={<UserProfileStatsPage />} />
+              <Route path="setting" element={<SettingPage />} />
             </Route>
           </Route>
         </Route>

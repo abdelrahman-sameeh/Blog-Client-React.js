@@ -14,9 +14,6 @@
   flex: 1;
 }
 
-.rounded-full {
-  border-radius: 50%;
-}
 
 .text-truncate-2 {
   overflow: hidden;

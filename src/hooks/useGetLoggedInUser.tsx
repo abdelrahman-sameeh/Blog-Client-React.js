@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import authAxios from "../api/auth-axios";
 import { ApiEndpoints } from "../api/api-endpoints";
-import type { IUser } from "../utils/interfaces/user-interface";
 import { useLocation } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { userAtom } from "../recoil/user.atom";
 
 export const useLoggedInUser = (ignoreCache: boolean = false) => {
-  const [user, setUser] = useState<IUser>({});
+  const [user, setUser] = useRecoilState(userAtom);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();

@@ -23,8 +23,7 @@ export const AvatarDropdown = () => {
           <img
             src={user.picture}
             style={{ width: "40px", height: "40px", objectFit: "cover" }}
-            className={`rounded-full ${style.avatarMenu}`}
-            data-bs-toggle="dropdown"
+            className={`rounded-circle ${style.avatarMenu}`}
           />
         ) : (
           <span
@@ -35,13 +34,20 @@ export const AvatarDropdown = () => {
         )}
       </Dropdown.Toggle>
       <Dropdown.Menu align={"end"} className="dropdown-menu">
-        <Link className="dropdown-item" to={user.role=='admin' ? `/dashboard/admin/articles-reports` : `/dashboard/user/articles`}>
+        <Link
+          className="dropdown-item"
+          to={
+            user.role == "admin"
+              ? `/dashboard/admin/articles-reports`
+              : `/dashboard/user/articles`
+          }
+        >
           Dashboard
         </Link>
-        <Link className="dropdown-item" to="/dashboard/profile">
+        <Link className="dropdown-item" to="/dashboard/shared/profile">
           Profile
         </Link>
-        <Link className="dropdown-item" to="/dashboard/setting">
+        <Link className="dropdown-item" to="/dashboard/shared/setting">
           Settings
         </Link>
         <hr className="dropdown-divider" />

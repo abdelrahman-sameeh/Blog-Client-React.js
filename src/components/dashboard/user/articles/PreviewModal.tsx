@@ -55,7 +55,7 @@ export const PreviewModal = ({
                   height={45}
                 />
               ) : (
-                <p className="border m-0 rounded-full px-2 py-2 border-dark text-uppercase">
+                <p className="border m-0 rounded-circle px-2 py-2 border-dark text-uppercase">
                   {article.user?.firstName?.[0]}
                   {article.user?.lastName?.[0]}{" "}
                 </p>
