@@ -22,18 +22,23 @@ export const AuthHome = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const deleteArticleModal = useModal();
+  const limit = 10;
 
   const fetchArticles = async () => {
     let responseData: any = [];
     if (radioValue === "forYou") {
       const response = await authAxios(
         true,
-        ApiEndpoints.getHomePageArticles(`?limit=3&page=${page}`)
+        ApiEndpoints.getHomePageArticles(`?limit=${limit}&page=${page}`)
       );
       responseData = response?.data?.data?.articles || [];
-    } else {
+    } else if(radioValue=="featured") {
       // Featured articles
-      responseData = [];
+      const response = await authAxios(
+        true,
+        ApiEndpoints.getHomePageArticlesFeature(`?limit=${limit}&page=${page}`)
+      );
+      responseData = response?.data?.data?.articles || [];
     }
 
     setArticles((prev) => [...prev, ...responseData]);
