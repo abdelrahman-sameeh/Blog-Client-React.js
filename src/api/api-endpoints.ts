@@ -48,4 +48,6 @@ export const ApiEndpoints = {
   getFollowersOnly: (query: string = "") => `${mainPath}/followers-only${query}`,
   getFollowingOnly: (query: string = "") => `${mainPath}/following-only${query}`,
   pendingRequestsSent: (query: string = "") => `${mainPath}/pending-requests-sent${query}`,
+  startChat: `${mainPath}/get-or-create-chat`,
+  getChatWithMessage: (chatId: string) => `${mainPath}/chat/${chatId}`,
 }

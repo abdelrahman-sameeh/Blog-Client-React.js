@@ -18,6 +18,7 @@ import { WriterProfilePage } from "./pages/main-layout/writer/WriterProfilePage"
 import { FriendRequestPage } from "./pages/main-layout/writer/FriendRequestPage";
 import { UserProfileStatsPage } from "./pages/dashboard-layout/shared/UserProfileStatsPage";
 import { SettingPage } from "./pages/dashboard-layout/shared/SettingPage";
+import { ChatPage } from "./pages/main-layout/chat/ChatPage";
 
 function App() {
   return (
@@ -37,6 +38,10 @@ function App() {
 
         {/* Dashboard layout */}
         <Route element={<IsAuth />}>
+          <Route element={<MainLayout />}>
+            <Route path={'/chat/:id'} element={<ChatPage />} />
+          </Route>
+
           <Route path="/dashboard" element={<DashboardLayout />}>
             {/* Admin Role */}
             <Route path="admin">
