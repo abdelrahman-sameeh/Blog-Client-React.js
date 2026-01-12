@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
 import type { IUser } from "../../../utils/interfaces/user-interface";
@@ -31,6 +31,7 @@ export const WriterProfilePage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const deleteArticleModal = useModal();
+  const navigate = useNavigate();
 
   const fetchWriter = async (id: string) => {
     const response = await authAxios(
@@ -197,6 +198,14 @@ export const WriterProfilePage = () => {
     }));
   };
 
+  const handleStartChat = async () => {
+    const data = {
+      receiver: writer._id
+    }
+    const response = await authAxios(true, ApiEndpoints.startChat, "POST", data);
+    navigate(`/chat/${response?.data?._id}`)
+  }
+
   return (
     <main className="main-content">
       <div className="custom-container">
@@ -269,7 +278,7 @@ export const WriterProfilePage = () => {
                   {relationship?.followers?.includes(user._id) &&
                     !relationship?.blockers?.includes(id as string) && (
                       <>
-                        <LoadingButton variant="outline-dark">
+                        <LoadingButton onClick={handleStartChat} variant="outline-dark">
                           Chat
                         </LoadingButton>
                         <LoadingButton
