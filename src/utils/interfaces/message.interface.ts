@@ -7,13 +7,19 @@ export interface IMessage {
   chat: IChat;
   sender: IUser;
   content: string;
-  type: 'text' | 'image' | 'video' | 'file' | 'voice' | 'system';
+  type: 'text' | 'voice' | 'system';
   seenBy: IUser[];
   replyTo: IMessage | null;
-  deletedFor: {
-    user: IUser;
-    deletedType: 'soft' | 'hard'
-  }
+  attachments: {
+    url: string;
+    attachmentType: 'image' | 'video' | 'document'
+  }[];
+  deletedFor: IUser[] | string[];
+  deletedForAll: {
+    isDeleted: boolean;
+    deletedBy?: string;
+    deletedAt?: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

@@ -50,4 +50,8 @@ export const ApiEndpoints = {
   pendingRequestsSent: (query: string = "") => `${mainPath}/pending-requests-sent${query}`,
   startChat: `${mainPath}/get-or-create-chat`,
   getChatWithMessage: (chatId: string) => `${mainPath}/chat/${chatId}`,
+  deleteMessage: (messageId: string) => `${mainPath}/message/${messageId}`,
+  clearChat: (chatId: string) => `${mainPath}/chat/${chatId}/clear`,
+  uploadVoice:  (chatId: string) =>  `${mainPath}/voice/${chatId}`,
+
 }

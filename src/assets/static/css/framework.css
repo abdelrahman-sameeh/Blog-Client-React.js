@@ -23,3 +23,7 @@
   -webkit-line-clamp: 2;
   line-clamp: 2;
 }
+
+.no-arrow::after {
+  display: none !important;
+}
