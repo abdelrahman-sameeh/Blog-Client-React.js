@@ -2,46 +2,60 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
-import type { IMessage } from "../../../utils/interfaces/message.interface";
-import type { IUser } from "../../../utils/interfaces/user-interface";
 import { Card, Col, Dropdown, Form, Image, Row } from "react-bootstrap";
 import { LoadingButton } from "../../../components/utils/LoadingButton";
 import { socket } from "../../../socket/socket";
 import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
 import { FiSend } from "react-icons/fi";
 import { FaMicrophone, FaStop } from "react-icons/fa";
-import { IoIosAttach } from "react-icons/io";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { BsFileText, BsThreeDotsVertical } from "react-icons/bs";
 import { formatTime } from "../../../utils/common/format-time";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { attachmentsAtom } from "../../../recoil/attachments.atom";
+import { useModal } from "../../../hooks/useModal";
+import { imageViewAtom } from "../../../recoil/image-view.atom";
+
+import type { IMessage } from "../../../utils/interfaces/message.interface";
+import type { IUser } from "../../../utils/interfaces/user-interface";
+import { AttachmentsComp } from "../../../components/main-layout/chat/AttachmentComp";
+import { ImageViewModal } from "../../../components/main-layout/chat/ViewImageModal";
 
 export const ChatPage = () => {
   const { id: chatId } = useParams();
+  const { user } = useLoggedInUser();
+
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [receiver, setReceiver] = useState<Partial<IUser>>({});
-  const [replyMessage, setReplayMessage] = useState<Partial<IMessage>>({});
+  const [replyMessage, setReplyMessage] = useState<Partial<IMessage>>({});
   const [isRecording, setIsRecording] = useState(false);
+  const [attachments, setAttachments] = useRecoilState(attachmentsAtom);
+  const [recordTime, setRecordTime] = useState(0);
+  const setImageUrl = useSetRecoilState(imageViewAtom);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const [recordTime, setRecordTime] = useState(0); // الوقت بالثواني
   const timerRef = useRef<NodeJS.Timer | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const { user } = useLoggedInUser();
-
-  const getChatWithMessage = async () => {
-    const response = await authAxios(
-      true,
-      ApiEndpoints.getChatWithMessage(chatId as string),
-    );
-
-    setMessages(response?.data?.messages || []);
-    setReceiver(response?.data?.receiver || {});
-  };
+  const chatBodyRef = useRef<HTMLDivElement>(null);
+  const isFetchingRef = useRef(false);
+  const hasMoreMessagesRef = useRef(true);
+  const firstFetch = useRef(true);
+  const imageViewModal = useModal();
 
   useEffect(() => {
     getChatWithMessage();
   }, []);
 
+  // scroll to bottom in first load dom
+  useEffect(() => {
+    if (firstFetch.current && messages.length) {
+      requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      });
+    }
+  }, [firstFetch, messages]);
+
+  // socket
   useEffect(() => {
     if (!user?._id) return;
 
@@ -68,6 +82,7 @@ export const ChatPage = () => {
     };
   }, [user?._id]);
 
+  // recording timer
   useEffect(() => {
     if (isRecording) {
       setRecordTime(0); // إعادة تعيين الوقت عند بداية التسجيل
@@ -89,9 +104,84 @@ export const ChatPage = () => {
     };
   }, [isRecording]);
 
+  const openImageModal = (url: string) => {
+    imageViewModal.open();
+    setImageUrl(url);
+  };
+
+  const getChatWithMessage = async () => {
+    const response = await authAxios(
+      true,
+      ApiEndpoints.getChatWithMessage(chatId as string),
+    );
+
+    setMessages(response?.data?.data?.messages || []);
+    setReceiver(response?.data?.receiver || {});
+  };
+
+  async function fetchOlderMessages() {
+    const response = await authAxios(
+      true,
+      ApiEndpoints.listMessages(
+        chatId as string,
+        `?before=${messages[0]?._id}`,
+      ),
+      "GET",
+    );
+
+    setMessages((prev) => [...response.data, ...prev]);
+    if (response.data.length < 20) {
+      hasMoreMessagesRef.current = false;
+    }
+
+    if (firstFetch.current) {
+      firstFetch.current = false;
+    }
+  }
+
+  const handleScrollToTop = async () => {
+    const el = chatBodyRef.current;
+    if (!el || isFetchingRef.current) return;
+
+    // لو وصلنا فوق خالص
+    if (el.scrollTop === 0) {
+      isFetchingRef.current = true;
+
+      const prevHeight = el.scrollHeight;
+
+      if (hasMoreMessagesRef.current) {
+        await fetchOlderMessages();
+      }
+
+      // نحافظ على مكان الـ scroll
+      requestAnimationFrame(() => {
+        const newHeight = el.scrollHeight;
+        el.scrollTop = newHeight - prevHeight;
+        isFetchingRef.current = false;
+      });
+    }
+  };
+
   const handleSendMessage = async (e: FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() && !attachments.length) return;
+
+    let response;
+
+    if (attachments.length) {
+      const formData = new FormData();
+      attachments.forEach((att) => {
+        formData.append("file", att.file);
+      });
+
+      response = await authAxios(
+        true,
+        ApiEndpoints.uploadMessageAttachments(chatId as string),
+        "POST",
+        formData,
+        "multipart/form-data",
+      );
+    }
 
     const payload: any = {
       _id: new Date(),
@@ -107,17 +197,24 @@ export const ChatPage = () => {
       payload["replyTo"] = replyMessage;
     }
 
+    if (attachments.length && response.status == 201) {
+      payload["attachments"] = response?.data;
+    }
+
     setNewMessage("");
     socket.emit("message:send", payload);
-    setReplayMessage({});
+    setReplyMessage({});
+    setAttachments([]);
 
-    requestAnimationFrame(() => {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    });
+    if (messages.length) {
+      requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      });
+    }
   };
 
   const handleReply = (message: IMessage) => {
-    setReplayMessage(message);
+    setReplyMessage(message);
   };
 
   const handleClearChat = async () => {
@@ -255,6 +352,8 @@ export const ChatPage = () => {
             <Card.Body
               className="flex-grow-1 overflow-auto"
               style={{ background: "#f5f5f5" }}
+              onScroll={handleScrollToTop}
+              ref={chatBodyRef}
             >
               {messages.map((msg) => {
                 const isReceiver = msg.sender?._id === receiver?._id;
@@ -305,9 +404,7 @@ export const ChatPage = () => {
                     ) : (
                       <div
                         id={`msg-${msg._id}`}
-                        className={`p-2 rounded ${
-                          isReceiver ? "bg-white" : "bg-secondary text-white"
-                        }`}
+                        className={`p-2 rounded`}
                         style={{ maxWidth: "70%" }}
                       >
                         {/* Reply preview */}
@@ -344,42 +441,117 @@ export const ChatPage = () => {
                           </div>
                         )}
 
-                        {/* Message content + menu */}
-                        <div className="d-flex align-items-center gap-2">
-                          {msg.type == "text" && <span>{msg.content}</span>}
-                          {msg.type == "voice" && (
-                            <audio controls style={{ width: "250px" }}>
-                              <source src={msg.content} type="audio/webm" />
-                              Your browser does not support the audio element.
-                            </audio>
-                          )}
+                        <div
+                          className={`p-1 rounded-1 ${
+                            isReceiver ? "bg-white" : "bg-secondary text-white"
+                          } `}
+                        >
+                          <div className="d-flex justify-content-between align-items-center">
+                            <span className="small">{msg.sender.username}</span>
+                            <Dropdown>
+                              <Dropdown.Toggle
+                                id="dropdown-basic"
+                                className={`bg-transparent border-0 no-arrow p-0 ${
+                                  isReceiver ? "text-dark" : "text-white"
+                                }`}
+                              >
+                                <BsThreeDotsVertical />
+                              </Dropdown.Toggle>
 
-                          <Dropdown>
-                            <Dropdown.Toggle
-                              id="dropdown-basic"
-                              className={`bg-transparent border-0 no-arrow p-0 ${
-                                isReceiver ? "text-dark" : "text-white"
-                              }`}
-                            >
-                              <BsThreeDotsVertical />
-                            </Dropdown.Toggle>
-
-                            <Dropdown.Menu>
-                              <Dropdown.Item onClick={() => handleReply(msg)}>
-                                Reply
-                              </Dropdown.Item>
-                              <Dropdown.Item onClick={() => handleDelete(msg)}>
-                                Delete
-                              </Dropdown.Item>
-                              {!isReceiver && (
-                                <Dropdown.Item
-                                  onClick={() => handleDeleteForAll(msg)}
-                                >
-                                  Delete For All
+                              <Dropdown.Menu>
+                                <Dropdown.Item onClick={() => handleReply(msg)}>
+                                  Reply
                                 </Dropdown.Item>
-                              )}
-                            </Dropdown.Menu>
-                          </Dropdown>
+                                <Dropdown.Item
+                                  onClick={() => handleDelete(msg)}
+                                >
+                                  Delete
+                                </Dropdown.Item>
+                                {!isReceiver && (
+                                  <Dropdown.Item
+                                    onClick={() => handleDeleteForAll(msg)}
+                                  >
+                                    Delete For All
+                                  </Dropdown.Item>
+                                )}
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          </div>
+                          <hr className="mt-0 mb-1" />
+
+                          {/* Attachments */}
+                          <div className="attachments d-flex flex-wrap gap-1">
+                            {msg.attachments?.map((att, i) => {
+                              if (att.attachmentType === "image") {
+                                return (
+                                  <img
+                                    key={i}
+                                    src={
+                                      att.url.startsWith("http")
+                                        ? att.url
+                                        : `http://localhost:3000${att.url}`
+                                    }
+                                    alt="image"
+                                    style={{
+                                      width: 100,
+                                      height: 100,
+                                      objectFit: "cover",
+                                      borderRadius: 8,
+                                      flex: 1,
+                                      cursor: "pointer",
+                                    }}
+                                    onClick={() => openImageModal(att.url)}
+                                  />
+                                );
+                              }
+
+                              if (att.attachmentType === "video") {
+                                return (
+                                  <video
+                                    key={i}
+                                    controls
+                                    style={{ width: 200, borderRadius: 8 }}
+                                    src={
+                                      att.url.startsWith("http")
+                                        ? att.url
+                                        : `http://localhost:3000${att.url}`
+                                    }
+                                  />
+                                );
+                              }
+
+                              if (att.attachmentType === "document") {
+                                return (
+                                  <a
+                                    key={i}
+                                    href={
+                                      att.url.startsWith("http")
+                                        ? att.url
+                                        : `http://localhost:3000${att.url}`
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="d-flex text-light align-items-center gap-1 p-1 border rounded"
+                                  >
+                                    <BsFileText />
+                                    <span style={{ fontSize: 12 }}>
+                                      {"Document"}
+                                    </span>
+                                  </a>
+                                );
+                              }
+                            })}
+                          </div>
+                          {/* Message content + menu */}
+                          <div className="d-flex align-items-center justify-content-between gap-2 p-1 rounded-5">
+                            {msg.type == "text" && <span> {msg.content}</span>}
+                            {msg.type == "voice" && (
+                              <audio controls style={{ width: "250px" }}>
+                                <source src={msg.content} type="audio/webm" />
+                                Your browser does not support the audio element.
+                              </audio>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -410,7 +582,7 @@ export const ChatPage = () => {
                     <button
                       type="button"
                       className="btn btn-sm btn-link text-danger p-0 ms-2"
-                      onClick={() => setReplayMessage({})}
+                      onClick={() => setReplyMessage({})}
                     >
                       ✕
                     </button>
@@ -418,8 +590,9 @@ export const ChatPage = () => {
                 ) : (
                   <></>
                 )}
+
                 <Row>
-                  {!isRecording && (
+                  {!isRecording ? (
                     <Col style={{ flex: "5" }}>
                       <Form.Control
                         className="shadow-none"
@@ -428,51 +601,44 @@ export const ChatPage = () => {
                         onChange={(e) => setNewMessage(e.target.value)}
                       />
                     </Col>
+                  ) : (
+                    <></>
                   )}
 
                   <Col
                     xs="auto"
                     className="p-0 d-flex align-items-center flex-1 justify-content-end"
                   >
-                    {!isRecording && (
-                      <Dropdown drop={"up"}>
-                        <Dropdown.Toggle
-                          id="dropdown-basic"
-                          variant="outline-secondary"
-                          className="btn me-1 no-arrow px-2"
-                        >
-                          <IoIosAttach className="fs-5" />
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item>Image</Dropdown.Item>
-                          <Dropdown.Item>Video</Dropdown.Item>
-                          <Dropdown.Item>Document</Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    )}
-                    {isRecording && (
+                    {!isRecording ? <AttachmentsComp /> : <></>}
+                    {isRecording ? (
                       <span style={{ flex: ".5" }} className="me-2">
                         {formatTime(recordTime)}
                       </span>
+                    ) : (
+                      <></>
                     )}
-                    {!newMessage.trim() && (
+                    {!newMessage.trim() && attachments.length == 0 ? (
                       <LoadingButton
                         variant={isRecording ? "danger" : "outline-secondary"}
                         onClick={isRecording ? stopRecording : startRecording}
                       >
                         {isRecording ? <FaStop /> : <FaMicrophone />}
                       </LoadingButton>
+                    ) : (
+                      <></>
                     )}
-                    {newMessage.trim() && (
+                    {newMessage.trim() || attachments.length > 0 ? (
                       <LoadingButton
                         type="submit"
                         variant="outline-secondary ms-1"
                       >
                         <FiSend />
                       </LoadingButton>
+                    ) : (
+                      <></>
                     )}
 
-                    {isRecording && (
+                    {isRecording ? (
                       <LoadingButton
                         type="button"
                         onClick={stopRecording}
@@ -480,6 +646,8 @@ export const ChatPage = () => {
                       >
                         <FiSend />
                       </LoadingButton>
+                    ) : (
+                      <></>
                     )}
                   </Col>
                 </Row>
@@ -488,6 +656,13 @@ export const ChatPage = () => {
           </Card>
         </Col>
       </Row>
+      <ImageViewModal
+        show={imageViewModal.isOpen}
+        handleClose={() => {
+          imageViewModal.close();
+          setImageUrl("");
+        }}
+      />
     </main>
   );
 };
