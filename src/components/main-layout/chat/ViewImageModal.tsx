@@ -17,11 +17,7 @@ export const ImageViewModal = ({
       </Modal.Header>
       <Modal.Body>
         <img
-          src={
-            imageUrl.startsWith("http")
-              ? imageUrl
-              : `http://localhost:3000${imageUrl}`
-          }
+          src={imageUrl}
           alt="image"
           style={{
             width: "100%",

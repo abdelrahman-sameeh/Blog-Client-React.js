@@ -17,8 +17,11 @@ import { imageViewAtom } from "../../../recoil/image-view.atom";
 
 import type { IMessage } from "../../../utils/interfaces/message.interface";
 import type { IUser } from "../../../utils/interfaces/user-interface";
+
 import { AttachmentsComp } from "../../../components/main-layout/chat/AttachmentComp";
 import { ImageViewModal } from "../../../components/main-layout/chat/ViewImageModal";
+import { ChatImageComp } from "../../../components/main-layout/chat/ImageCacheComp";
+import { VideoCacheComp } from "../../../components/main-layout/chat/VideoCacheComp";
 
 export const ChatPage = () => {
   const { id: chatId } = useParams();
@@ -103,11 +106,6 @@ export const ChatPage = () => {
       }
     };
   }, [isRecording]);
-
-  const openImageModal = (url: string) => {
-    imageViewModal.open();
-    setImageUrl(url);
-  };
 
   const getChatWithMessage = async () => {
     const response = await authAxios(
@@ -482,53 +480,28 @@ export const ChatPage = () => {
                           {/* Attachments */}
                           <div className="attachments d-flex flex-wrap gap-1">
                             {msg.attachments?.map((att, i) => {
+                              const fullUrl = att.url.startsWith("http")
+                                ? att.url
+                                : `http://localhost:3000${att.url}`;
                               if (att.attachmentType === "image") {
                                 return (
-                                  <img
+                                  <ChatImageComp
                                     key={i}
-                                    src={
-                                      att.url.startsWith("http")
-                                        ? att.url
-                                        : `http://localhost:3000${att.url}`
-                                    }
-                                    alt="image"
-                                    style={{
-                                      width: 100,
-                                      height: 100,
-                                      objectFit: "cover",
-                                      borderRadius: 8,
-                                      flex: 1,
-                                      cursor: "pointer",
-                                    }}
-                                    onClick={() => openImageModal(att.url)}
+                                    url={fullUrl}
+                                    imageViewModal={imageViewModal}
                                   />
                                 );
                               }
 
                               if (att.attachmentType === "video") {
-                                return (
-                                  <video
-                                    key={i}
-                                    controls
-                                    style={{ width: 200, borderRadius: 8 }}
-                                    src={
-                                      att.url.startsWith("http")
-                                        ? att.url
-                                        : `http://localhost:3000${att.url}`
-                                    }
-                                  />
-                                );
+                                return <VideoCacheComp key={i} url={fullUrl} />;
                               }
 
                               if (att.attachmentType === "document") {
                                 return (
                                   <a
                                     key={i}
-                                    href={
-                                      att.url.startsWith("http")
-                                        ? att.url
-                                        : `http://localhost:3000${att.url}`
-                                    }
+                                    href={fullUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="d-flex text-light align-items-center gap-1 p-1 border rounded"
