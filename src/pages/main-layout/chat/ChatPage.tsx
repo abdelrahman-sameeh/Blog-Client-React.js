@@ -22,6 +22,7 @@ import { AttachmentsComp } from "../../../components/main-layout/chat/Attachment
 import { ImageViewModal } from "../../../components/main-layout/chat/ViewImageModal";
 import { ChatImageComp } from "../../../components/main-layout/chat/ImageCacheComp";
 import { VideoCacheComp } from "../../../components/main-layout/chat/VideoCacheComp";
+import { saveImage } from "../../../db/image.store";
 
 export const ChatPage = () => {
   const { id: chatId } = useParams();
@@ -197,6 +198,18 @@ export const ChatPage = () => {
 
     if (attachments.length && response.status == 201) {
       payload["attachments"] = response?.data;
+      // save attachments in indexedDB
+      for (const att of response.data) {
+        if (att.attachmentType === "image") {
+          try {
+            const res = await fetch(att.url);
+            const blob = await res.blob();
+            await saveImage(att.url, blob);
+          } catch (err) {
+            // add emit mitrics here
+          }
+        }
+      }
     }
 
     setNewMessage("");
