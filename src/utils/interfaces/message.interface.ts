@@ -1,3 +1,4 @@
+import type { IAttachment } from "./attachment.interface";
 import type { IChat } from "./chat.interface";
 import type { IUser } from "./user-interface";
 
@@ -10,16 +11,14 @@ export interface IMessage {
   type: 'text' | 'voice' | 'system';
   seenBy: IUser[];
   replyTo: IMessage | null;
-  attachments: {
-    url: string;
-    attachmentType: 'image' | 'video' | 'document'
-  }[];
+  attachments: IAttachment[];
   deletedFor: IUser[] | string[];
   deletedForAll: {
     isDeleted: boolean;
     deletedBy?: string;
     deletedAt?: Date;
   };
+  isDeletedForAll?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

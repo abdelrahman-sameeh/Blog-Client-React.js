@@ -23,12 +23,14 @@ import { ImageViewModal } from "../../../components/main-layout/chat/ViewImageMo
 import { ChatImageComp } from "../../../components/main-layout/chat/ImageCacheComp";
 import { VideoCacheComp } from "../../../components/main-layout/chat/VideoCacheComp";
 import { saveImage } from "../../../db/image.store";
+import { DeleteDropdownAttachment } from "../../../components/main-layout/chat/DeleteDropdownAttachment";
+import { messagesAtom } from "../../../recoil/messages.atom";
 
 export const ChatPage = () => {
   const { id: chatId } = useParams();
   const { user } = useLoggedInUser();
 
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [messages, setMessages] = useRecoilState(messagesAtom);
   const [newMessage, setNewMessage] = useState("");
   const [receiver, setReceiver] = useState<Partial<IUser>>({});
   const [replyMessage, setReplyMessage] = useState<Partial<IMessage>>({});
@@ -78,6 +80,12 @@ export const ChatPage = () => {
       );
     });
 
+    socket.on("attachment:deleted:for-all", (message: IMessage) => {
+      setMessages((prev) =>
+        prev.map((msg) => (msg._id == message._id ? message : msg)),
+      );
+    });
+
     return () => {
       socket.emit("leave", {
         chatId,
@@ -114,7 +122,7 @@ export const ChatPage = () => {
       ApiEndpoints.getChatWithMessage(chatId as string),
     );
 
-    setMessages(response?.data?.data?.messages || []);
+    setMessages(response?.data?.messages || []);
     setReceiver(response?.data?.receiver || {});
   };
 
@@ -128,7 +136,7 @@ export const ChatPage = () => {
       "GET",
     );
 
-    setMessages((prev) => [...response.data, ...prev]);
+    setMessages((prev) => [...(response.data || []), ...prev]);
     if (response.data.length < 20) {
       hasMoreMessagesRef.current = false;
     }
@@ -311,6 +319,9 @@ export const ChatPage = () => {
     }
   };
 
+  console.log(messages);
+  
+
   return (
     <main className="main-content custom-container d-flex justify-content-center align-items-center">
       <Row className="justify-content-center h-100 mb-3 flex-1">
@@ -458,7 +469,9 @@ export const ChatPage = () => {
                           } `}
                         >
                           <div className="d-flex justify-content-between align-items-center">
-                            <span className="small">{msg.sender.username}</span>
+                            <span className="small">
+                              {msg?.sender?.username}
+                            </span>
                             <Dropdown>
                               <Dropdown.Toggle
                                 id="dropdown-basic"
@@ -496,35 +509,93 @@ export const ChatPage = () => {
                               const fullUrl = att.url.startsWith("http")
                                 ? att.url
                                 : `http://localhost:3000${att.url}`;
-                              if (att.attachmentType === "image") {
-                                return (
-                                  <ChatImageComp
-                                    key={i}
-                                    url={fullUrl}
-                                    imageViewModal={imageViewModal}
-                                  />
-                                );
-                              }
 
-                              if (att.attachmentType === "video") {
-                                return <VideoCacheComp key={i} url={fullUrl} />;
-                              }
+                              const attachmentNotDeleted =
+                                att?.deleteFor?.indexOf(user?._id as string) ==
+                                -1;
 
-                              if (att.attachmentType === "document") {
+                              const attachmentDeletedForAll =
+                                att?.deleteForAll?.isDeleted == true &&
+                                att?.deleteForAll?.deletedBy?.toString() !=
+                                  user?._id?.toString();
+
+                              if (attachmentDeletedForAll) {
                                 return (
-                                  <a
+                                  <div
                                     key={i}
-                                    href={fullUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="d-flex text-light align-items-center gap-1 p-1 border rounded"
+                                    style={{ width: "170px" }}
+                                    className="position-relative border rounded p-1"
                                   >
-                                    <BsFileText />
-                                    <span style={{ fontSize: 12 }}>
-                                      {"Document"}
-                                    </span>
-                                  </a>
+                                    <div className={`text-muted fst-italic small`}>
+                                      Attachment deleted
+                                    </div>
+                                    <DeleteDropdownAttachment
+                                      token=""
+                                      attachment={att}
+                                      message={msg}
+                                      isReceiver={isReceiver}
+                                    />
+                                  </div>
                                 );
+                              }
+
+                              if (attachmentNotDeleted) {
+                                if (att.attachmentType === "image") {
+                                  return (
+                                    <div key={i} className="position-relative">
+                                      <ChatImageComp
+                                        url={fullUrl}
+                                        imageViewModal={imageViewModal}
+                                      />
+                                      <DeleteDropdownAttachment
+                                        attachment={att}
+                                        message={msg}
+                                        isReceiver={isReceiver}
+                                      />
+                                    </div>
+                                  );
+                                }
+
+                                if (att.attachmentType === "video") {
+                                  return (
+                                    <div key={i} className="position-relative">
+                                      <VideoCacheComp url={fullUrl} />
+                                      <DeleteDropdownAttachment
+                                        attachment={att}
+                                        message={msg}
+                                        isReceiver={isReceiver}
+                                        token="video"
+                                      />
+                                    </div>
+                                  );
+                                }
+
+                                if (att.attachmentType === "document") {
+                                  return (
+                                    <div
+                                      key={i}
+                                      className="position-relative flex-1"
+                                    >
+                                      <a
+                                        href={fullUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="d-flex text-light align-items-center gap-1 p-1 border rounded"
+                                      >
+                                        <BsFileText />
+                                        <span style={{ fontSize: 12 }}>
+                                          {"Document"}
+                                        </span>
+                                      </a>
+                                      <DeleteDropdownAttachment
+                                        attachment={att}
+                                        message={msg}
+                                        isReceiver={isReceiver}
+                                        token="doc"
+                                      />
+                                    </div>
+                                  );
+                                }
                               }
                             })}
                           </div>
