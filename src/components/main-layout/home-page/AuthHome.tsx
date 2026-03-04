@@ -15,8 +15,7 @@ export const AuthHome = () => {
     { name: "For you", value: "forYou" },
     { name: "Featured", value: "featured" },
   ];
-  type RadioValue = (typeof radios)[number]["value"];
-  const [radioValue, setRadioValue] = useState<RadioValue>("forYou");
+  const [radioValue, setRadioValue] = useState("forYou");
 
   const [articles, setArticles] = useRecoilState(articlesAtom);
   const [page, setPage] = useState(1);
@@ -25,7 +24,7 @@ export const AuthHome = () => {
   const limit = 10;
 
   const fetchArticles = async () => {
-    let responseData: any = [];
+    let responseData: any = [];       
     if (radioValue === "forYou") {
       const response = await authAxios(
         true,

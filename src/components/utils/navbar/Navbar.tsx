@@ -6,6 +6,7 @@ import { AvatarDropdown } from "./AvatarDropdown";
 import { Sidebar } from "../sidebar/Sidebar";
 import { HiMiniBars3BottomRight } from "react-icons/hi2";
 import { FaUserFriends } from "react-icons/fa";
+import { IoChatboxEllipses } from "react-icons/io5";
 
 export const Navbar = () => {
   const { user } = useLoggedInUser();
@@ -35,6 +36,12 @@ export const Navbar = () => {
                 className="text-dark text-decoration-none text-capitalize d-flex gap-1"
               >
                 <FaUserFriends className="fs-4" />
+              </Link>
+              <Link
+                to={"/chat-list"}
+                className="text-dark text-decoration-none text-capitalize d-flex gap-1"
+              >
+                <IoChatboxEllipses className="fs-4" />
               </Link>
               <Link
                 to={"/dashboard/user/create-article"}

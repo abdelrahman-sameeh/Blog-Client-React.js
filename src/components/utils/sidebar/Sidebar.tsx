@@ -1,4 +1,4 @@
-import { IoCloseCircleOutline } from "react-icons/io5";
+import { IoChatboxEllipses, IoCloseCircleOutline } from "react-icons/io5";
 import { Search } from "../navbar/Search";
 import { Link } from "react-router-dom";
 import { MdOutlineNoteAlt } from "react-icons/md";
@@ -35,6 +35,12 @@ export const Sidebar = () => {
         >
           <MdOutlineNoteAlt className="fs-3" />
           write
+        </Link>
+        <Link
+          to={"/chat-list"}
+          className="text-dark text-decoration-none text-capitalize d-flex gap-1"
+        >
+          <IoChatboxEllipses className="fs-4" />
         </Link>
         <Link
           to={"/friend-requests"}

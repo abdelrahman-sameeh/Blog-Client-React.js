@@ -318,8 +318,6 @@ export const ChatPage = () => {
       socket.emit("message:send", payload);
     }
   };
-
-  console.log(messages);
   
 
   return (

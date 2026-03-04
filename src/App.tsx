@@ -19,6 +19,7 @@ import { FriendRequestPage } from "./pages/main-layout/writer/FriendRequestPage"
 import { UserProfileStatsPage } from "./pages/dashboard-layout/shared/UserProfileStatsPage";
 import { SettingPage } from "./pages/dashboard-layout/shared/SettingPage";
 import { ChatPage } from "./pages/main-layout/chat/ChatPage";
+import { ChatListPage } from "./pages/main-layout/chat/ChatListPage";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/search" element={<SearchArticlesPage />} />
           <Route path="/writer/:id" element={<WriterProfilePage />} />
           <Route path="/friend-requests" element={<FriendRequestPage />} />
+          <Route path="/chat-list" element={<ChatListPage />} />
         </Route>
 
         {/* Dashboard layout */}
