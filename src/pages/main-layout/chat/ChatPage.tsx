@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
 import { Card, Col, Dropdown, Form, Image, Row } from "react-bootstrap";
@@ -14,10 +14,7 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { attachmentsAtom } from "../../../recoil/attachments.atom";
 import { useModal } from "../../../hooks/useModal";
 import { imageViewAtom } from "../../../recoil/image-view.atom";
-
 import type { IMessage } from "../../../utils/interfaces/message.interface";
-import type { IUser } from "../../../utils/interfaces/user-interface";
-
 import { AttachmentsComp } from "../../../components/main-layout/chat/AttachmentComp";
 import { ImageViewModal } from "../../../components/main-layout/chat/ViewImageModal";
 import { ChatImageComp } from "../../../components/main-layout/chat/ImageCacheComp";
@@ -25,14 +22,16 @@ import { VideoCacheComp } from "../../../components/main-layout/chat/VideoCacheC
 import { saveImage } from "../../../db/image.store";
 import { DeleteDropdownAttachment } from "../../../components/main-layout/chat/DeleteDropdownAttachment";
 import { messagesAtom } from "../../../recoil/messages.atom";
+import { receiverAtom } from "../../../recoil/receiver.atom";
 
 export const ChatPage = () => {
   const { id: chatId } = useParams();
   const { user } = useLoggedInUser();
+  const navigate = useNavigate();
 
   const [messages, setMessages] = useRecoilState(messagesAtom);
   const [newMessage, setNewMessage] = useState("");
-  const [receiver, setReceiver] = useState<Partial<IUser>>({});
+  const [receiver, setReceiver] = useRecoilState(receiverAtom);
   const [replyMessage, setReplyMessage] = useState<Partial<IMessage>>({});
   const [isRecording, setIsRecording] = useState(false);
   const [attachments, setAttachments] = useRecoilState(attachmentsAtom);
@@ -49,15 +48,23 @@ export const ChatPage = () => {
   const imageViewModal = useModal();
 
   useEffect(() => {
-    getChatWithMessage();
+    if (chatId != "new-chat") {
+      getChatWithMessage();
+    }
+    setReceiver(JSON.parse(sessionStorage.getItem("writer") || "{}"));
   }, []);
 
-  // scroll to bottom in first load dom
   useEffect(() => {
+    // scroll to bottom in first load dom
     if (firstFetch.current && messages.length) {
       requestAnimationFrame(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
       });
+    }
+
+    // navigate to chat id if first message is sent
+    if (chatId == "new-chat" && messages.length > 0) {
+      navigate(`/chat/${messages[0]?.chat}`);
     }
   }, [firstFetch, messages]);
 
@@ -66,7 +73,6 @@ export const ChatPage = () => {
     if (!user?._id) return;
 
     socket.emit("join", {
-      chatId,
       sender: user?._id,
     });
 
@@ -88,7 +94,6 @@ export const ChatPage = () => {
 
     return () => {
       socket.emit("leave", {
-        chatId,
         sender: user._id,
       });
     };
@@ -123,7 +128,7 @@ export const ChatPage = () => {
     );
 
     setMessages(response?.data?.messages || []);
-    setReceiver(response?.data?.receiver || {});
+    // setReceiver(response?.data?.receiver || {});
   };
 
   async function fetchOlderMessages() {
@@ -198,6 +203,7 @@ export const ChatPage = () => {
       createdAt: new Date(),
       seenBy: [user._id!],
       chat: chatId,
+      receiverId: receiver._id,
     };
 
     if (replyMessage?._id) {
@@ -214,14 +220,14 @@ export const ChatPage = () => {
             const blob = await res.blob();
             await saveImage(att.url, blob);
           } catch (err) {
-            // add emit mitrics here
+            // add emit metric here
           }
         }
       }
     }
 
-    setNewMessage("");
     socket.emit("message:send", payload);
+    setNewMessage("");
     setReplyMessage({});
     setAttachments([]);
 
@@ -262,6 +268,7 @@ export const ChatPage = () => {
       message,
       user,
       chat: chatId,
+      receiverId: receiver._id,
     });
   };
 
@@ -313,12 +320,12 @@ export const ChatPage = () => {
         createdAt: new Date(),
         seenBy: [user._id!],
         chat: chatId,
+        receiverId: receiver._id,
       };
 
       socket.emit("message:send", payload);
     }
   };
-  
 
   return (
     <main className="main-content custom-container d-flex justify-content-center align-items-center">
@@ -524,7 +531,9 @@ export const ChatPage = () => {
                                     style={{ width: "170px" }}
                                     className="position-relative border rounded p-1"
                                   >
-                                    <div className={`text-muted fst-italic small`}>
+                                    <div
+                                      className={`text-muted fst-italic small`}
+                                    >
                                       Attachment deleted
                                     </div>
                                     <DeleteDropdownAttachment

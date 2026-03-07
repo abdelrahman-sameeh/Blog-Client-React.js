@@ -5,11 +5,12 @@ import { socket } from "../../../socket/socket";
 import type { IMessage } from "../../../utils/interfaces/message.interface";
 import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
 import { useParams } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { messagesAtom } from "../../../recoil/messages.atom";
 import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
 import notify from "../../utils/Notify";
+import { receiverAtom } from "../../../recoil/receiver.atom";
 
 export const DeleteDropdownAttachment = ({
   attachment,
@@ -25,6 +26,7 @@ export const DeleteDropdownAttachment = ({
   const { user } = useLoggedInUser();
   const { id: chatId } = useParams();
   const setMessages = useSetRecoilState(messagesAtom);
+  const receiver = useRecoilValue(receiverAtom);
 
   const handleDelete = async () => {
     const response = await authAxios(
@@ -46,7 +48,9 @@ export const DeleteDropdownAttachment = ({
         if (m._id !== message._id) return m;
         return {
           ...m,
-          attachments: m.attachments.filter((att) => att._id !== attachment._id),
+          attachments: m.attachments.filter(
+            (att) => att._id !== attachment._id,
+          ),
         };
       }),
     );
@@ -56,6 +60,7 @@ export const DeleteDropdownAttachment = ({
     const payload = {
       user,
       chatId,
+      receiverId: receiver._id,
       messageId: message._id,
       attachmentId: attachment._id,
     };
