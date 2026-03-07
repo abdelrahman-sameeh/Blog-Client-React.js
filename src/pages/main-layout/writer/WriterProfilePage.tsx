@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import authAxios from "../../../api/auth-axios";
 import { ApiEndpoints } from "../../../api/api-endpoints";
-import type { IUser } from "../../../utils/interfaces/user-interface";
 import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
 import { Image } from "react-bootstrap";
 import { LoadingButton } from "../../../components/utils/LoadingButton";
@@ -12,11 +11,13 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { ArticleCardComponent } from "../../../components/main-layout/search-articles-page/ArticleCardComponent";
 import { DeleteArticleModalComponent } from "../../../components/main-layout/search-articles-page/DeleteArticleModalComponent";
 import type { IArticle } from "../../../utils/interfaces/article.interface";
+import { useRecoilState } from "recoil";
+import { receiverAtom } from "../../../recoil/receiver.atom";
 
 export const WriterProfilePage = () => {
   const { id } = useParams();
   const { user } = useLoggedInUser();
-  const [writer, setWriter] = useState<IUser>({});
+  const [writer, setWriter] = useRecoilState(receiverAtom);
   const [relationship, setRelationship] = useState<{
     followers: string[];
     blockers: string[];
@@ -36,9 +37,10 @@ export const WriterProfilePage = () => {
   const fetchWriter = async (id: string) => {
     const response = await authAxios(
       user?._id ? true : false,
-      ApiEndpoints.getWriter(id)
+      ApiEndpoints.getWriter(id),
     );
     setWriter(response?.data?.writer);
+    sessionStorage.setItem('writer', JSON.stringify(response?.data?.writer))
     setRelationship((prev) => ({
       ...prev,
       followers: response?.data?.followers,
@@ -55,7 +57,7 @@ export const WriterProfilePage = () => {
     let responseData: any = [];
     const response = await authAxios(
       true,
-      ApiEndpoints.getArticlesByWriter(id as string, `?limit=3&page=${page}`)
+      ApiEndpoints.getArticlesByWriter(id as string, `?limit=3&page=${page}`),
     );
     responseData = response?.data?.data?.articles || [];
 
@@ -129,7 +131,7 @@ export const WriterProfilePage = () => {
     const response = await authAxios(
       true,
       ApiEndpoints.block(id as string),
-      "PATCH"
+      "PATCH",
     );
 
     if (response.status == 200) {
@@ -157,7 +159,7 @@ export const WriterProfilePage = () => {
     const response = await authAxios(
       true,
       ApiEndpoints.unblock(id as string),
-      "PATCH"
+      "PATCH",
     );
 
     if (response.status == 200) {
@@ -189,7 +191,7 @@ export const WriterProfilePage = () => {
       true,
       ApiEndpoints.sendCancelGetRequest(),
       token == "send" ? "POST" : "DELETE",
-      data
+      data,
     );
     setLoadings((prev) => ({ ...prev, sendRequest: false }));
     setRelationship((prev) => ({
@@ -199,12 +201,19 @@ export const WriterProfilePage = () => {
   };
 
   const handleStartChat = async () => {
-    const data = {
-      receiver: writer._id
+    const response = await authAxios(
+      true,
+      ApiEndpoints.findChat(
+        writer._id as string,
+      ) /* writer.id ==> receiverId */,
+      "GET",
+    );
+    if (response.status == 200) {
+      navigate(`/chat/${response?.data?._id}`);
+      return;
     }
-    const response = await authAxios(true, ApiEndpoints.startChat, "POST", data);
-    navigate(`/chat/${response?.data?._id}`)
-  }
+    navigate(`/chat/new-chat`);
+  };
 
   return (
     <main className="main-content">
@@ -278,7 +287,10 @@ export const WriterProfilePage = () => {
                   {relationship?.followers?.includes(user._id) &&
                     !relationship?.blockers?.includes(id as string) && (
                       <>
-                        <LoadingButton onClick={handleStartChat} variant="outline-dark">
+                        <LoadingButton
+                          onClick={handleStartChat}
+                          variant="outline-dark"
+                        >
                           Chat
                         </LoadingButton>
                         <LoadingButton
