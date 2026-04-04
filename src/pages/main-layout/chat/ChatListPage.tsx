@@ -7,6 +7,8 @@ import type { IMessage } from "../../../utils/interfaces/message.interface";
 import type { IUser } from "../../../utils/interfaces/user-interface";
 import { Link } from "react-router-dom";
 import { FaMicrophone, FaRegTrashAlt } from "react-icons/fa";
+import { useLoggedInUser } from "../../../hooks/useGetLoggedInUser";
+import { socket } from "../../../socket/socket";
 
 type ChatType = {
   lastMessage: IMessage;
@@ -22,9 +24,9 @@ const radios = [
 export const ChatListPage = () => {
   const [radioValue, setRadioValue] = useState("chat");
   const [chats, setChats] = useState<ChatType[]>([]);
-
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const { user } = useLoggedInUser();
 
   const LIMIT = 10;
 
@@ -60,6 +62,48 @@ export const ChatListPage = () => {
     setPage(nextPage);
     fetchChats(nextPage);
   };
+
+  function buildLastMessage(message: IMessage) {
+    return {
+      _id: message._id,
+      content: message.content,
+      attachments: message.attachments,
+      createdAt: message.createdAt,
+      type: message.type,
+      deletedForAll: message.deletedForAll,
+      isDeletedForAll: message?.isDeletedForAll,
+    };
+  }
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    // refresh last message when send new message in chat list page
+    socket.on("message:sent", (message) => {
+      const updatedLastMessage: any = buildLastMessage(message);
+
+      setChats((chats) =>
+        chats.map((ch) =>
+          ch._id == message.chat
+            ? { ...ch, lastMessage: updatedLastMessage }
+            : ch,
+        ),
+      );
+    });
+
+    // refresh last message when delete last message
+    socket.on("message:deleted:for-all", (message: IMessage) => {
+      const updatedLastMessage: any = buildLastMessage(message);
+
+      setChats((chats) =>
+        chats.map((ch) =>
+          ch._id == message.chat && ch.lastMessage._id == message._id
+            ? { ...ch, lastMessage: updatedLastMessage }
+            : ch,
+        ),
+      );
+    });
+  }, [user?._id]);
 
   return (
     <main className="main-content">

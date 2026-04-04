@@ -72,10 +72,6 @@ export const ChatPage = () => {
   useEffect(() => {
     if (!user?._id) return;
 
-    socket.emit("join", {
-      sender: user?._id,
-    });
-
     socket.on("message:sent", (message) => {
       setMessages((prev) => prev.concat(message));
     });
@@ -92,11 +88,6 @@ export const ChatPage = () => {
       );
     });
 
-    return () => {
-      socket.emit("leave", {
-        sender: user._id,
-      });
-    };
   }, [user?._id]);
 
   // recording timer

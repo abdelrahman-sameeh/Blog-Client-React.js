@@ -20,8 +20,25 @@ import { UserProfileStatsPage } from "./pages/dashboard-layout/shared/UserProfil
 import { SettingPage } from "./pages/dashboard-layout/shared/SettingPage";
 import { ChatPage } from "./pages/main-layout/chat/ChatPage";
 import { ChatListPage } from "./pages/main-layout/chat/ChatListPage";
+import { useEffect } from "react";
+import { socket } from "./socket/socket";
+import { useLoggedInUser } from "./hooks/useGetLoggedInUser";
 
 function App() {
+  const { user } = useLoggedInUser();
+
+  useEffect(() => {
+    socket.emit("join", {
+      sender: user?._id,
+    });
+
+    return () => {
+      socket.emit("leave", {
+        sender: user?._id,
+      });
+    };
+  }, [user?._id]);
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -34,16 +51,18 @@ function App() {
           <Route path="/article/:id" element={<SpecificArticlePage />} />
           <Route path="/search" element={<SearchArticlesPage />} />
           <Route path="/writer/:id" element={<WriterProfilePage />} />
-          <Route path="/friend-requests" element={<FriendRequestPage />} />
-          <Route path="/chat-list" element={<ChatListPage />} />
         </Route>
 
-        {/* Dashboard layout */}
+        {/* Auth Guard */}
         <Route element={<IsAuth />}>
+          {/* Main layout */}
           <Route element={<MainLayout />}>
-            <Route path={'/chat/:id'} element={<ChatPage />} />
+            <Route path={"/chat/:id"} element={<ChatPage />} />
+            <Route path="/friend-requests" element={<FriendRequestPage />} />
+            <Route path="/chat-list" element={<ChatListPage />} />
           </Route>
 
+          {/* Dashboard layout */}
           <Route path="/dashboard" element={<DashboardLayout />}>
             {/* Admin Role */}
             <Route path="admin">
