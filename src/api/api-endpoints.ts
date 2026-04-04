@@ -56,4 +56,5 @@ export const ApiEndpoints = {
   uploadMessageAttachments: (chatId: string) =>  `${mainPath}/chat/${chatId}/attachments`,
   listMessages: (chatId: string, query: string) =>  `${mainPath}/chat/${chatId}/messages${query}`,
   deleteAttachment: (messageId: string, attachmentId: string) => `${mainPath}/message/${messageId}/attachment/${attachmentId}`,
+  getChatList: (query: any) => `${mainPath}/chat-list${query}`
 }

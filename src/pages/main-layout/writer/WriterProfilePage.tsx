@@ -40,7 +40,7 @@ export const WriterProfilePage = () => {
       ApiEndpoints.getWriter(id),
     );
     setWriter(response?.data?.writer);
-    sessionStorage.setItem('writer', JSON.stringify(response?.data?.writer))
+    sessionStorage.setItem("writer", JSON.stringify(response?.data?.writer));
     setRelationship((prev) => ({
       ...prev,
       followers: response?.data?.followers,
@@ -271,6 +271,13 @@ export const WriterProfilePage = () => {
                 </div>
               ) : user?._id ? (
                 <div className="d-flex gap-2">
+                  <LoadingButton
+                    onClick={handleStartChat}
+                    variant="outline-dark"
+                  >
+                    Chat
+                  </LoadingButton>
+
                   {/* لو مش تابعين ومفيش block */}
                   {!relationship?.followers?.length &&
                     !relationship?.blockers?.length && (
@@ -287,12 +294,6 @@ export const WriterProfilePage = () => {
                   {relationship?.followers?.includes(user._id) &&
                     !relationship?.blockers?.includes(id as string) && (
                       <>
-                        <LoadingButton
-                          onClick={handleStartChat}
-                          variant="outline-dark"
-                        >
-                          Chat
-                        </LoadingButton>
                         <LoadingButton
                           loading={loadings?.unfollow}
                           onClick={handleUnfollow}
